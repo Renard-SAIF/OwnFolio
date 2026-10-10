@@ -2,12 +2,7 @@
 
 **给一级市场投资人的项目记录与复盘工具。**
 
-> OwnFolio helps early-stage investors keep a deal log and review their>   
-> own judgement over time. One product, three forms: an **agent skill** (let your AI keep>   
-> the log for you), a **web app** (open in any browser, nothing to install), a **desktop>   
-> app** for Windows / macOS / Linux. Meanwhile, we also provide you a **static HTML dashboard** you can forward.
-
-
+> OwnFolio helps early-stage investors keep a deal log and review their own judgement over time. One product, three forms: an **agent skill** (let your AI keep the log for you), a **web app** (open in any browser, nothing to install), a **desktop app** for Windows / macOS / Linux. Meanwhile, we also provide you a **static HTML dashboard** you can forward.
 
 ![看板示例](skill/assets/screenshot.png)
 
@@ -27,8 +22,9 @@
 
 ## 形态一：AI Skill
 
-把BP、会议纪要、访谈录音转写丢给AI，说一句"录进我的项目库"。它会按22个标准字段提取，  
-缺的必填项反问你，确认后写进你指定的表格，同时追加一条看法流水。
+把公司BP、会议纪要、访谈录音转写等丢给AI，说一句"录进我的项目库"。它会按22个标准字段提取，
+  
+缺的必填项反问你，确认后写进项目库中，同时追加一条看法流水。
 
 - 支持飞书（电子表格/多维表格）、钉钉、本地Excel、腾讯文档等项目库
 - 具体说明详见[`skill/`](skill/)
@@ -40,12 +36,13 @@
 ![网页版](web/screenshot.png)
 
 - **直接用**：把 [`web/index.html`](web/index.html) 下载下来，双击用浏览器打开
-- **部署成网址**：在仓库Settings → Pages里，把来源设成 `main` 分支的 `/web` 文件夹，    
+- **部署成网址**：在仓库Settings → Pages里，把来源设成 `main` 分支的 `/web` 文件夹，
+    
   就能得到一个 `https://你的用户名.github.io/invest-desk/` 这样的地址，手机也能直接开
 
 数据保存在浏览器当中，如需清理浏览器，请导出备份。
 
-手机上是这样的（窄屏自动单列）：
+手机版（窄屏自动单列）：
 
 ![网页版手机端](web/screenshot-mobile.png)
 
@@ -66,15 +63,15 @@
 
 ### 安装包是怎么来的（跨平台分发）
 
-**仓库里放的是源码，不是安装包。** 安装包太大（每个八十多兆），不适合塞进代码仓库，  
-而且不同系统的安装包必须用对应系统的机器才能打出来——尤其是Mac，必须用macOS的打包工具，  
-**在Windows电脑上做不出来**。
+**仓库里放的是源码，不是安装包。** 安装包太大（每个八十多兆），不适合塞进代码仓库，
+  
+而且不同系统的安装包必须用对应系统的机器才能打出来——尤其是Mac，必须用macOS的打包工具，
+  
+自动流程解决：代码推上来之后，GitHub会开三台机器（Windows、Mac、Linux）分别打包，打好之后自动挂到Releases页面上。
+  
+用户只需要打入版本标签。配置在 [`.github/workflows/release.yml`](.github/workflows/release.yml)。
 
-所以这里用一个自动流程解决：代码推上来之后，GitHub会开三台机器  
-（Windows、Mac、Linux）分别打包，打好之后自动挂到Releases页面上。  
-你只要打个版本标签就行。配置在 [`.github/workflows/release.yml`](.github/workflows/release.yml)。
-
-想自己打包也行，在 `desktop/` 目录下：
+想要自己打包也可行，在 `desktop/` 目录下：
 
 ```bash
 npm ci
@@ -87,8 +84,10 @@ npm run build:all      # 三个平台全打（只能在 Mac 上跑）
 
 ## 它真正解决的问题
 
-大部分项目记录工具都在解决"怎么记下来"。但投资人真正的痛点不是记不住，  
-是**半年后回看时，已经想不起来当初是怎么判断的**——当时为什么看好，当时担心什么，  
+大部分项目记录工具都在解决"怎么记下来"。但投资人真正的痛点不是记不住，
+  
+是**半年后回看时，已经想不起来当初是怎么判断的**——当时为什么看好，当时担心什么，
+  
 后来到底应验了没有。
 
 所以这个工具围绕一件事设计：**让你每个时点的判断都留得住，并且能被事后打分。**
@@ -100,7 +99,8 @@ npm run build:all      # 三个平台全打（只能在 Mac 上跑）
 | 一个项目一行，存**现状**   | 一条看法一行，存**历史**      |
 | 首次录入时新增，之后只更新这一行 | 每次看法有变就**追加**，永不改旧行 |
 
-如果十月一号的看法被十一月的新想法覆盖掉了，你就永远不知道"我当时是不是判断错了"——  
+如果十月一号的看法被十一月的新想法覆盖掉了，你就永远不知道"我当时是不是判断错了"——
+  
 而这恰恰是这个工具存在的全部意义。
 
 字段定义见 [`skill/references/schema.md`](skill/references/schema.md)。
