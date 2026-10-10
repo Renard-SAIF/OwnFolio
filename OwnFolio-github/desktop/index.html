@@ -1,0 +1,3039 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>投资项目记录台</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1a4e8a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="项目记录台">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="./icon.png">
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --line:#e5e8ec; --line2:#d0d5dc;
+  --ink:#141a21; --ink2:#5a6472; --ink3:#8a929e;
+  --brand:#1a4e8a; --brand-soft:#eaf2fa; --brand-dim:#16406f;
+  --accent:#a67c0c; --accent-soft:#fbf3e2;
+  --warn:#8a5a0b; --warn-soft:#fbf2e0;
+  --ok:#0f6e56; --ok-soft:#e4f3ee;
+  --danger:#a52d2d; --danger-soft:#fbeced;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased;}
+header{background:#fff;border-bottom:1px solid var(--line);padding:0 26px;min-height:58px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;letter-spacing:.2px;}
+.logo{width:28px;height:28px;border-radius:8px;background:var(--brand);
+  display:flex;align-items:center;justify-content:center;flex:none;}
+.brand span{color:var(--ink3);font-weight:400;font-size:12px;}
+/* 顶部的模型连接指示灯：填好模型接口亮绿灯，没填亮红灯 */
+#model-ind{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;
+  padding:3px 10px;border-radius:20px;white-space:nowrap;cursor:default;margin-left:2px;}
+#model-ind i{width:7px;height:7px;border-radius:50%;flex:none;display:inline-block;background:#c8ccd4;}
+#model-ind.on{background:var(--ok-soft);color:var(--ok);}
+#model-ind.on i{background:#17a35f;box-shadow:0 0 0 3px rgba(23,163,95,.18);}
+#model-ind.off{background:var(--danger-soft);color:var(--danger);}
+#model-ind.off i{background:#d64545;box-shadow:0 0 0 3px rgba(214,69,69,.16);}
+nav{display:flex;gap:2px;}
+nav button{border:0;background:transparent;color:var(--ink2);padding:0 15px;height:58px;
+  border-bottom:2px solid transparent;cursor:pointer;font-size:14px;font-family:inherit;
+  display:flex;align-items:center;gap:7px;transition:color .15s;}
+nav button:hover{color:var(--brand);}
+nav button.on{color:var(--brand);font-weight:600;border-bottom-color:var(--brand);}
+nav svg{flex:none;opacity:.75;}
+nav button.on svg{opacity:1;}
+main{max-width:1060px;margin:0 auto;padding:22px 26px 64px;}
+.panel{display:none;}
+.panel.on{display:block;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 2px rgba(16,24,40,.04);}
+.card h2{margin:0 0 3px;font-size:15px;font-weight:600;letter-spacing:.2px;}
+.card .hint{margin:0 0 14px;font-size:12px;color:var(--ink3);line-height:1.6;}
+.card h2 + div{margin-top:13px;}
+.card .hd + p.hint{margin-top:9px;}
+.card .hd{display:flex;align-items:center;gap:9px;margin-bottom:3px;}
+.card .hd .ico{width:26px;height:26px;border-radius:7px;background:var(--brand-soft);
+  display:flex;align-items:center;justify-content:center;flex:none;}
+label{display:block;font-size:12px;color:var(--ink2);margin:0 0 5px;font-weight:500;}
+label .req{color:var(--danger);margin-left:2px;}
+label .tag{color:var(--ink3);font-weight:400;font-size:11px;margin-left:5px;}
+input,select,textarea{width:100%;border:1px solid var(--line2);border-radius:9px;padding:9px 11px;
+  font-size:13px;font-family:inherit;background:#fff;color:var(--ink);outline:none;
+  transition:border-color .15s,box-shadow .15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(26,78,138,.10);}
+textarea{resize:vertical;line-height:1.7;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:13px;}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px;}
+.field{margin-bottom:13px;}
+.sec{font-size:12px;font-weight:600;color:var(--brand);letter-spacing:.6px;
+  margin:24px 0 13px;display:flex;align-items:center;gap:8px;}
+.sec::before{content:'';width:3px;height:13px;background:var(--brand);border-radius:2px;flex:none;}
+.sec.f{color:var(--ok);} .sec.f::before{background:var(--ok);}
+.sec.j{color:var(--accent);} .sec.j::before{background:var(--accent);}
+.btn{border:1px solid var(--line2);background:#fff;color:var(--ink);padding:8px 15px;border-radius:9px;
+  cursor:pointer;font-size:13px;font-family:inherit;transition:all .15s;}
+.btn:hover{border-color:var(--brand);color:var(--brand);}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:500;}
+.btn.pri:hover{background:var(--brand-dim);border-color:var(--brand-dim);color:#fff;}
+.btn.sm{padding:5px 11px;font-size:12px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;}
+.metric{background:#fafbfc;border:1px solid var(--line);border-radius:11px;padding:14px 12px;text-align:center;}
+.metric .n{font-size:26px;font-weight:600;line-height:1.15;letter-spacing:-.5px;
+  font-variant-numeric:tabular-nums;}
+.metric .l{font-size:12px;color:var(--ink3);margin-top:4px;}
+.bar{margin-bottom:9px;}
+.bar .top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;gap:10px;}
+.bar .top .nm{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar .top .v{color:var(--ink3);font-variant-numeric:tabular-nums;flex:none;}
+.bar .track{height:7px;background:#eef0f3;border-radius:4px;overflow:hidden;}
+.bar .fill{height:100%;background:var(--brand);border-radius:4px;transition:width .3s;}
+.item{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;
+  background:#fff;transition:border-color .15s,box-shadow .15s;}
+.item:hover{border-color:var(--line2);box-shadow:0 1px 3px rgba(16,24,40,.05);}
+.item .h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.item .nm{font-size:14px;font-weight:600;letter-spacing:.2px;}
+.item .meta{font-size:12px;color:var(--ink3);margin-top:3px;}
+.item .th{font-size:13px;color:var(--ink2);margin-top:8px;line-height:1.7;}
+.item .th b{color:var(--ink);font-weight:600;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
+.chip{font-size:11px;padding:3px 9px;border-radius:20px;background:#f0f2f5;color:var(--ink2);}
+.chip.b{background:var(--brand-soft);color:var(--brand);}
+.chip.g{background:var(--ok-soft);color:var(--ok);}
+.chip.w{background:var(--warn-soft);color:var(--warn);}
+.chip.r{background:var(--danger-soft);color:var(--danger);}
+.msg{font-size:12px;padding:9px 12px;border-radius:9px;margin-top:10px;display:none;line-height:1.6;}
+.msg.show{display:block;}
+.msg.err{background:var(--danger-soft);color:var(--danger);}
+.msg.ok{background:var(--ok-soft);color:var(--ok);}
+.msg.info{background:var(--brand-soft);color:var(--brand);}
+.empty{text-align:center;color:var(--ink3);font-size:13px;padding:34px 0;}
+.empty svg{margin-bottom:10px;opacity:.5;}
+.file-item{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:8px;font-size:13px;}
+.file-item .fn{display:flex;align-items:center;min-width:0;flex:1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-item .fs{font-size:11px;color:var(--ink3);margin-left:6px;}
+.file-item .fr{flex:none;display:flex;gap:6px;}
+.files-inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.flink{color:var(--brand);cursor:pointer;text-decoration:none;border-bottom:1px solid var(--brand-soft);}
+.flink:hover{border-bottom-color:var(--brand);}
+.sample-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  background:var(--brand-soft);border-radius:10px;padding:10px 14px;margin-bottom:12px;
+  font-size:12px;color:var(--brand);}
+.recall{background:var(--accent-soft);border-radius:10px;padding:13px 15px;margin-top:14px;}
+.recall .t{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:7px;letter-spacing:.3px;}
+.recall .i{font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:7px;}
+.detail{font-size:13px;line-height:1.8;}
+.detail dt{font-size:12px;color:var(--ink3);margin-top:10px;}
+.detail dd{margin:2px 0 0;white-space:pre-wrap;}
+.tools{display:flex;gap:8px;flex-wrap:wrap;}
+.banner{display:none;background:var(--warn-soft);border:1px solid #e0a53a;border-radius:12px;
+  padding:14px 16px;margin-bottom:14px;}
+.banner.show{display:block;}
+.banner .t{font-size:13px;font-weight:600;color:var(--warn);margin-bottom:6px;}
+.banner .d{font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:10px;}
+#app-shell{display:none;}
+#auth-shell{display:none;max-width:440px;margin:44px auto;padding:0 20px 60px;}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mode-card{text-align:left;border:1px solid var(--line2);background:#fff;border-radius:12px;
+  padding:14px 16px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.mode-card:hover{border-color:var(--brand);}
+.mode-card.on{border-color:var(--brand);background:var(--brand-soft);}
+.mode-card .mt{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:5px;}
+.mode-card.on .mt{color:var(--brand);}
+.mode-card .md{font-size:12px;color:var(--ink2);line-height:1.6;}
+.auth-tabs{display:flex;gap:6px;margin-bottom:18px;}
+.auth-tabs button{flex:1;padding:8px 4px;}
+.auth-tabs button.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600;}
+.auth-tabs button.on:hover{color:#fff;border-color:var(--brand);}
+/* 横向对比表 */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:11px;margin-top:12px;}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:720px;}
+.tbl th{text-align:left;font-weight:600;color:var(--ink3);font-size:11.5px;letter-spacing:.3px;
+  padding:9px 11px;border-bottom:1px solid var(--line2);background:#fafbfc;white-space:nowrap;}
+.tbl td{padding:11px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.65;}
+.tbl tbody tr:last-child td{border-bottom:0;}
+.tbl tbody tr:hover{background:#fafbfc;}
+.tbl .cmp{font-weight:600;color:var(--ink);white-space:nowrap;}
+.tbl .cell{max-width:230px;color:var(--ink2);}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap;}
+.tbl .none{color:var(--ink3);}
+/* 复盘页的横评表：列宽写死，长段落夹到 6 行，行高就不会被一段长看法撑爆 */
+.tbl-cmp{table-layout:fixed;min-width:920px;}
+.tbl-cmp th,.tbl-cmp td{padding:9px 9px;}
+.tbl-cmp .c1{width:86px;}
+.tbl-cmp .c2{width:52px;}
+.tbl-cmp .c3{width:70px;}
+.tbl-cmp .c4{width:56px;}
+.tbl-cmp .c5{width:124px;}
+.tbl-cmp .c6{width:176px;}
+.tbl-cmp .c7{width:190px;}
+.tbl-cmp .c8{width:166px;}
+.tbl-cmp .cmp{white-space:normal;word-break:break-word;}
+.tbl-cmp td{word-break:break-word;}
+.tbl-cmp .cell{max-width:none;}
+.clamped{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;
+  overflow:hidden;white-space:pre-wrap;}
+.clampbox.open .clamped{display:block;-webkit-line-clamp:none;overflow:visible;}
+.morebtn{border:0;background:none;padding:0;margin-top:5px;cursor:pointer;font-family:inherit;
+  font-size:11.5px;color:var(--brand);}
+.morebtn:hover{text-decoration:underline;}
+.pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;white-space:nowrap;}
+.pill.g{background:var(--ok-soft);color:var(--ok);}
+.pill.b{background:var(--brand-soft);color:var(--brand);}
+.pill.w{background:var(--warn-soft);color:var(--warn);}
+.pill.r{background:var(--danger-soft);color:var(--danger);}
+.pill.n{background:#f0f2f5;color:var(--ink2);}
+/* 时间胶囊 */
+.capsule{border-left:3px solid var(--accent);background:var(--accent-soft);
+  border-radius:0 10px 10px 0;padding:12px 15px;margin-bottom:10px;}
+.capsule .when{font-size:11px;color:var(--accent);font-weight:600;margin-bottom:5px;letter-spacing:.3px;}
+.capsule .who{font-size:13.5px;font-weight:600;margin-bottom:5px;}
+.capsule .said{font-size:12.5px;color:var(--ink2);line-height:1.75;white-space:pre-wrap;}
+.capsule .verdict{font-size:12px;margin-top:7px;}
+.sub-note{font-size:12px;color:var(--ink3);line-height:1.7;margin-top:10px;}
+/* 标题旁的小问号，鼠标放上去出说明 */
+.help{display:inline-flex;align-items:center;justify-content:center;flex:none;
+  width:15px;height:15px;border-radius:50%;border:1px solid var(--line2);background:#fff;
+  color:var(--ink3);font-size:10px;font-weight:600;cursor:help;margin-left:6px;
+  vertical-align:1px;position:relative;line-height:1;}
+.help:hover{color:var(--brand);border-color:var(--brand);}
+.help .tip{display:none;position:absolute;top:21px;left:0;z-index:30;width:300px;
+  background:#fff;border:1px solid var(--line2);border-radius:11px;padding:12px 14px;
+  font-size:12px;line-height:1.8;color:var(--ink2);font-weight:400;text-align:left;
+  box-shadow:0 8px 24px rgba(16,24,40,.13);cursor:default;white-space:normal;}
+.help:hover .tip{display:block;}
+#user-box{display:none;align-items:center;gap:10px;font-size:12px;color:var(--ink2);}
+.sync{font-size:12px;padding:3px 10px;border-radius:20px;background:var(--ok-soft);color:var(--ok);white-space:nowrap;}
+.sync.off{background:var(--warn-soft);color:var(--warn);}
+.sync.pending{background:var(--brand-soft);color:var(--brand);}
+@media (max-width:768px){
+  input,select,textarea{font-size:16px;}
+  .grid,.grid3{grid-template-columns:1fr;}
+  main{padding:16px 14px calc(64px + env(safe-area-inset-bottom));}
+  header{padding:0 14px;}
+  .btn{padding:10px 16px;}
+  nav button{padding:0 12px;height:52px;}
+  .mode-grid{grid-template-columns:1fr;}
+  .metric .n{font-size:22px;}
+  .card{padding:16px 16px;}
+}
+</style>
+</head>
+<body>
+<div id="app-shell">
+<header>
+  <div class="brand">
+    <div class="logo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12.5L6 7.5L9 10L14 3.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 3.5H14V6.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    投资项目记录台<span id="model-ind" class="off" title="在设置里填好模型接口，就能用智能整理"><i></i>模型未连接</span>
+  </div>
+  <nav>
+    <button id="tab-entry" class="on" onclick="go('entry')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>录入</button>
+    <button id="tab-list" onclick="go('list')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>项目库</button>
+    <button id="tab-stats" onclick="go('stats')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 13V8M8 13V3.5M12.5 13V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>汇总</button>
+    <button id="tab-review" onclick="go('review')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2.2a5.8 5.8 0 105.8 5.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 5.4V8l2.2 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13.4 1.6v2.4h-2.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>复盘</button>
+    <button id="tab-set" onclick="go('set')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.2" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.8v1.6M8 12.6v1.6M14.2 8h-1.6M3.4 8H1.8M12.4 3.6l-1.1 1.1M4.7 11.3l-1.1 1.1M12.4 12.4l-1.1-1.1M4.7 4.7L3.6 3.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>设置</button>
+  </nav>
+  <div id="user-box">
+    <span id="sync-state" class="sync">已同步</span>
+    <span id="user-email"></span>
+    <button class="btn sm" id="btn-switch" onclick="doSignOut()">退出</button>
+  </div>
+</header>
+
+<main>
+  <div id="banner" class="banner">
+    <div class="t">你现在打开的是本地文件，不是在线地址</div>
+    <div class="d">在线地址那份存云端、登录后可多设备同步；本地文件这份是独立的一套，两边不互通，也用不了登录和智能整理。建议先导出备份，再去在线地址导入。</div>
+    <div class="row">
+      <button class="btn" onclick="exportData()">先导出这份数据</button>
+      <button class="btn pri" onclick="goOnline()">前往在线版本</button>
+    </div>
+  </div>
+
+  <section id="view-entry" class="panel on">
+    <div class="card" id="due-card" style="display:none;">
+      <div class="hd"><div class="ico"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.8" stroke="#1a4e8a" stroke-width="1.4"/><path d="M8 4.6V8l2.4 1.6" stroke="#1a4e8a" stroke-width="1.4" stroke-linecap="round"/></svg></div><h2>该回头验证一下了</h2></div>
+      <div id="due-body"></div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><div class="ico"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5a2.5 2.5 0 012.5-2.5h6a2.5 2.5 0 012.5 2.5v3a2.5 2.5 0 01-2.5 2.5H5a2.5 2.5 0 01-2.5-2.5v-3z" stroke="#1a4e8a" stroke-width="1.4"/><path d="M6 5.5V4a2 2 0 114 0v1.5" stroke="#1a4e8a" stroke-width="1.4" stroke-linecap="round"/></svg></div><h2>智能整理</h2></div>
+      <textarea id="raw" rows="7" placeholder="把刚聊完的随手笔记粘进来，点下面的智能整理，会自动填好表单。&#10;&#10;例如：今天下午见了某某科技的王总和李工，聊了1个半小时，他们做人形机器人灵巧手，六维力传感器自研，说今年订单有3000万，毛利率40%左右，现在融A轮，要融1.5亿，投前估值8亿，是某某资本推过来的。我觉得团队技术底子不错，但成本降不下来，客户太集中……"></textarea>
+      <div class="row" style="margin-top:11px;">
+        <button class="btn pri" id="btn-ai" onclick="aiParse()">智能整理</button>
+        <button class="btn" id="btn-doc" onclick="pickMinutes()">上传会议纪要</button>
+        <button class="btn" onclick="clearForm()">清空表单</button>
+        <span id="ai-state" style="font-size:12px;color:var(--ink3);"></span>
+      </div>
+      <input type="file" id="minutes-input" style="display:none" accept=".txt,.md,.docx,.pdf,.markdown" onchange="onMinutesPicked(this)">
+      <div id="doc-state" style="font-size:12px;color:var(--brand);margin-top:6px;"></div>
+      <div id="entry-msg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>项目记录</h2>
+
+      <div class="sec">公司概况</div>
+      <div class="grid">
+        <div class="field"><label>公司名称<span class="req">*</span></label><input id="f-company"></div>
+        <div class="field"><label>行业标签<span class="req">*</span></label><select id="f-industry"></select>
+          <div id="wrap-ind-other" style="display:none;margin-top:8px;">
+            <input id="f-industryOther" placeholder="赛道名称">
+            <div style="font-size:11px;color:var(--ink3);margin-top:5px;line-height:1.5;">保存后自动加入词表</div>
+          </div>
+        </div>
+        <div class="field"><label>融资轮次<span class="req">*</span></label><select id="f-round"></select>
+          <div id="wrap-round-other" style="display:none;margin-top:8px;">
+            <input id="f-roundOther" placeholder="轮次名称">
+            <div style="font-size:11px;color:var(--ink3);margin-top:5px;line-height:1.5;">保存后自动加入词表</div>
+          </div>
+        </div>
+        <div class="field"><label>决策状态<span class="req">*</span></label><select id="f-status"></select></div>
+        <div class="field"><label>项目来源<span class="req">*</span></label><select id="f-sourceType"></select>
+          <div id="wrap-source-detail" style="display:none;margin-top:8px;">
+            <input id="f-sourceDetail">
+          </div>
+        </div>
+        <div class="field"><label>兴趣度<span class="req">*</span><span class="tag">1分最低 5分最高</span></label><select id="f-score"></select></div>
+        <div class="field"><label>交流日期</label><input id="f-meetDate" type="date"></div>
+        <div class="field"><label>对方参会人及角色</label><input id="f-attendees"></div>
+        <div class="field"><label>信息可信度</label><select id="f-credibility"></select></div>
+      </div>
+      <div class="field"><label>一句话投资逻辑<span class="req">*</span></label><input id="f-thesis"></div>
+
+      <div class="sec f">事实 · 对方说了什么</div>
+      <div class="field"><label>产品与技术</label><textarea id="f-product" rows="2"></textarea></div>
+      <div class="field"><label>竞争对手与差异点</label><textarea id="f-competitors" rows="2"></textarea></div>
+      <div class="field"><label>收入与财务情况</label><textarea id="f-revenue" rows="2"></textarea></div>
+      <div class="field"><label>本轮融资与估值</label><textarea id="f-financing" rows="2" placeholder="融资金额、投前投后估值、领投方、老股东是否跟投"></textarea></div>
+
+      <div class="sec j">判断 · 我是怎么想的</div>
+      <div class="field"><label>我的看法</label><textarea id="f-myView" rows="3"></textarea></div>
+      <div class="field" id="wrap-drop"><label>放弃原因</label><textarea id="f-dropReason" rows="2"></textarea></div>
+      <div class="grid">
+        <div class="field"><label>下次跟进日期</label><input id="f-nextFollow" type="date"></div>
+        <div class="field"><label>当初的预测应验了吗</label><select id="f-concernResult" onchange="toggleMissReason()"></select></div>
+      </div>
+      <div class="field" id="wrap-miss" style="display:none;">
+        <label>为什么没中 · 主观判断和客观事实差在哪</label>
+        <textarea id="f-missReason" rows="2" placeholder="当时是怎么想的，后来实际发生了什么，差在哪一步"></textarea>
+      </div>
+
+      <div id="recall" class="recall" style="display:none;">
+        <div class="t">同赛道历史对照</div>
+        <div id="recall-body"></div>
+      </div>
+
+      <div class="sec f">资料附件</div>
+      <div class="row" style="margin-bottom:10px;">
+        <button class="btn" onclick="pickFiles()">选择文件上传</button>
+        <span style="font-size:12px;color:var(--ink3);">商业计划书、财务模型、会议纪要等</span>
+      </div>
+      <input type="file" id="file-input" multiple style="display:none" accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip,.rar" onchange="onFilesPicked(this)">
+      <div id="file-list"></div>
+      <div id="file-hint" style="font-size:12px;color:var(--brand);margin-top:4px;"></div>
+
+      <div class="row" style="margin-top:20px;">
+        <button class="btn pri" onclick="saveEntry()">保存这条记录</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-list" class="panel">
+    <div class="card">
+      <div class="row" style="margin-bottom:12px;">
+        <input id="q" placeholder="搜索公司名、产品、看法……" oninput="renderList()" style="flex:1;min-width:200px;">
+        <select id="q-industry" onchange="renderList()" style="width:auto;min-width:130px;"></select>
+        <select id="q-status" onchange="renderList()" style="width:auto;min-width:120px;"></select>
+        <button class="btn" onclick="exportData()">导出备份</button>
+        <button class="btn" onclick="document.getElementById('imp').click()">导入备份</button>
+        <input id="imp" type="file" accept=".json" style="display:none" onchange="importData(this)">
+        <button class="btn" onclick="exportCSV()">导出表格</button>
+        <button class="btn" onclick="document.getElementById('imp-csv').click()">从表格导入</button>
+        <input id="imp-csv" type="file" accept=".csv,.txt" style="display:none" onchange="importCSV(this)">
+      </div>
+      <div id="csv-preview"></div>
+      <div id="list-body"></div>
+    </div>
+  </section>
+
+  <section id="view-stats" class="panel">
+    <div class="card">
+      <h2>总体情况</h2>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));" id="metrics"></div>
+    </div>
+    <div class="grid3">
+      <div class="card"><h2>行业分布</h2><div id="c-industry"></div></div>
+      <div class="card"><h2>融资轮次分布</h2><div id="c-round"></div></div>
+      <div class="card"><h2>决策状态分布</h2><div id="c-status"></div></div>
+      <div class="card"><h2>项目来源分布</h2><div id="c-source"></div></div>
+    </div>
+    <div class="card">
+      <div class="hd"><div class="ico"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.6" stroke="#1a4e8a" stroke-width="1.4"/><path d="M3 13.5c0-2.6 2.2-4.2 5-4.2s5 1.6 5 4.2" stroke="#1a4e8a" stroke-width="1.4" stroke-linecap="round"/></svg></div>      <h2>我的投资画像</h2></div>
+      <p class="hint" style="margin-top:8px;">根据项目汇总的特征生成投资画像</p>
+      <button class="btn pri" id="btn-portrait" onclick="aiPortrait()">生成投资画像</button>
+      <div id="portrait-msg" class="msg"></div>
+      <div id="portrait" class="detail" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="card">
+      <h2>行业词表</h2>
+      <p class="hint">根据录入的项目自动生成</p>
+      <div id="ind-list" class="chips"></div>
+    </div>
+  </section>
+
+  <section id="view-review" class="panel">
+    <div class="card">
+      <div class="hd"><div class="ico"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2.5 3.5h4v9h-4zM9.5 3.5h4v6h-4z" stroke="#1a4e8a" stroke-width="1.4"/></svg></div><h2>同赛道横评<span class="help">?<span class="tip">把同一个赛道看过的公司摆在一张表里横向比较。用法：① 上面选一个赛道，表里的公司按兴趣度从高到低排；② 重点看「本轮融资与估值」和「我的判断 · 结果」两列，谁贵、谁的预判后来应验了一目了然；③ 想让模型替你通读一遍并给出结论，点「让模型写一段横评」。同一个赛道攒够两家以上才有得比。</span></span></h2></div>
+      <div class="row" style="margin-bottom:4px;">
+        <select id="rv-industry" onchange="renderCompare()" style="width:auto;min-width:170px;"></select>
+        <button class="btn pri" id="btn-cmp-ai" onclick="aiCompare()">让模型写一段横评</button>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));" id="cmp-metrics"></div>
+      <div id="cmp-body"></div>
+      <div id="cmp-msg" class="msg"></div>
+      <div id="cmp-ai" class="detail" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><div class="ico"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.8v12.4M4.2 4.6H11M4.2 11.4H11" stroke="#1a4e8a" stroke-width="1.4" stroke-linecap="round"/></svg></div><h2>时间胶囊<span class="help">?<span class="tip">回到过去，看当时你写下的判断和后来的结果。用法：① 上面选一个季度，先看那三个月看了多少项目、推进到哪一步；② 下面的「回看」选半年前／一年前／两年前，会把那个时间段你写下的原话和它现在的走向并排摆出来；③ 挑一条点「编辑」，把「当初的预测应验了吗」补上，命中率才算得出来。</span></span></h2></div>
+      <div class="row" style="margin-bottom:4px;">
+        <select id="rv-quarter" onchange="renderQuarter()" style="width:auto;min-width:170px;"></select>
+        <label style="margin:0;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2);">
+          回看
+          <select id="rv-lookback" onchange="renderQuarter()" style="width:auto;padding:6px 9px;">
+            <option value="6">半年前</option>
+            <option value="12">一年前</option>
+            <option value="24">两年前</option>
+          </select>
+          同期记的
+        </label>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));" id="q-metrics"></div>
+      <div id="q-body"></div>
+    </div>
+  </section>
+
+  <section id="view-set" class="panel">
+    <div class="card">
+      <h2>模型接口</h2>
+      <div class="field" style="max-width:340px;">
+        <label>供应商名称</label>
+        <input id="ai-vendor" onchange="applyVendor()" placeholder="自己填，如 DeepSeek、Kimi、智谱、通义">
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+        <div class="field"><label>接口地址</label><input id="ai-base"></div>
+        <div class="field"><label>模型名</label><input id="ai-model"></div>
+        <div class="field"><label>API Key</label><input id="ai-key" type="password"></div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <button class="btn pri" onclick="saveAISettings()">保存</button>
+        <button class="btn" onclick="testAI()">测试连接</button>
+        <button class="btn" onclick="clearAISettings()">清除</button>
+        <span id="ai-cfg-state" style="font-size:12px;color:var(--ink3);"></span>
+      </div>
+      <div id="ai-test-msg" class="msg"></div>
+    </div>
+
+    <div class="card" id="card-datadir" style="display:none;">
+      <h2>数据管理</h2>
+      <div class="row">
+        <button class="btn" onclick="openDataFolder()">打开数据文件夹</button>
+        <button class="btn" onclick="changeDataDir()">更改存放位置</button>
+        <button class="btn" onclick="exportData()">导出备份</button>
+      </div>
+      <div id="datadir-msg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>云同步</h2>
+      <p class="hint">开启多设备同步</p>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+        <div class="field"><label>应用地址</label><input id="cf-endpoint" placeholder="https://你的应用域名"></div>
+        <div class="field"><label>应用门牌</label><input id="cf-pk" placeholder="wbpk_xxxxxxxx"></div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <button class="btn" onclick="saveCloudSettings()">保存并重新连接</button>
+        <span id="cf-state" style="font-size:12px;color:var(--ink3);"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>关于</h2>
+      <p class="hint">版本 <span id="about-ver">1.4.0</span></p>
+    </div>
+  </section>
+</main>
+</div>
+
+<div id="auth-shell">
+  <div class="card">
+    <div class="hd"><div class="ico"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2.5v3.2M8 5.7L4.6 9.2M8 5.7l3.4 3.5" stroke="#1a4e8a" stroke-width="1.4" stroke-linecap="round"/></svg></div><h2>你想怎么用这个记录台</h2></div>
+    <p class="hint">两种用法数据互不干扰</p>
+    <div class="mode-grid">
+      <button class="mode-card" id="mode-local" onclick="pickMode('local')">
+        <div class="mt">只用本机</div>
+        <div class="md">数据只存在这台设备的浏览器里，不上传，谁都看不到</div>
+      </button>
+      <button class="mode-card" id="mode-cloud" onclick="pickMode('cloud')">
+        <div class="mt">云端同步</div>
+        <div class="md">用邮箱登录，换设备打开还是同一份数据</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="card" id="pane-local" style="display:none;">
+    <div class="hd"><div class="ico"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="8" rx="1.6" stroke="#1a4e8a" stroke-width="1.4"/><path d="M5.5 13.5h5" stroke="#1a4e8a" stroke-width="1.4" stroke-linecap="round"/></svg></div><h2>只用本机</h2></div>
+    <p class="hint">数据存在这台设备的浏览器里，不会上传。换设备或清理浏览器之前，记得导出备份。</p>
+    <button class="btn pri" style="width:100%" onclick="useOffline()">开始使用</button>
+  </div>
+
+  <div id="pane-cloud" style="display:none;">
+  <div class="card">
+    <div class="hd"><div class="ico"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="3.5" y="7" width="9" height="6.5" rx="1.6" stroke="#1a4e8a" stroke-width="1.4"/><path d="M5.8 7V5.4a2.2 2.2 0 014.4 0V7" stroke="#1a4e8a" stroke-width="1.4" stroke-linecap="round"/></svg></div><h2>登录记录台</h2></div>
+    <p class="hint">登录后数据存云端，换设备打开是同一份</p>
+    <div class="auth-tabs">
+      <button id="atab-pwd" class="btn on" onclick="authTab('pwd')">密码登录</button>
+      <button id="atab-otp" class="btn" onclick="authTab('otp')">验证码登录</button>
+      <button id="atab-up" class="btn" onclick="authTab('up')">注册</button>
+    </div>
+
+    <div id="apane-pwd">
+      <div class="field"><label>邮箱</label><input id="pw-email" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>密码</label><input id="pw-pass" type="password" placeholder="登录密码"></div>
+      <button class="btn pri" style="width:100%" onclick="loginPwd()">登录</button>
+      <div style="margin-top:12px;text-align:right;"><a href="javascript:void(0)" style="font-size:12px;color:var(--brand);" onclick="authTab('forgot')">忘记密码</a></div>
+    </div>
+
+    <div id="apane-otp" style="display:none;">
+      <div class="field"><label>邮箱</label><input id="ot-email" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>验证码</label>
+        <div class="row"><input id="ot-code" placeholder="邮箱收到的验证码" style="flex:1;min-width:140px;">
+        <button class="btn" id="ot-send" onclick="sendCode('ot')">获取验证码</button></div>
+      </div>
+      <button class="btn pri" style="width:100%" onclick="loginOtp()">登录</button>
+    </div>
+
+    <div id="apane-up" style="display:none;">
+      <div class="field"><label>邮箱</label><input id="up-email" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>验证码</label>
+        <div class="row"><input id="up-code" placeholder="邮箱收到的验证码" style="flex:1;min-width:140px;">
+        <button class="btn" id="up-send" onclick="sendCode('up')">获取验证码</button></div>
+      </div>
+      <div class="field"><label>设置密码</label><input id="up-pass" type="password" placeholder="设一个密码，以后可直接用邮箱加密码登录"></div>
+      <div class="field" id="wrap-invite"><label>邀请码<span class="req">*</span></label><input id="up-invite" autocomplete="off"></div>
+      <button class="btn pri" style="width:100%" onclick="signUp()">注册并登录</button>
+    </div>
+
+    <div id="apane-forgot" style="display:none;">
+      <div class="field"><label>邮箱</label><input id="fg-email" type="email" placeholder="注册时用的邮箱"></div>
+      <button class="btn" onclick="forgotSend()">第一步：发送重置验证码</button>
+      <div class="field" style="margin-top:12px;"><label>第二步：填验证码和新密码</label><input id="fg-code" placeholder="邮箱收到的验证码"></div>
+      <div class="field"><input id="fg-pass" type="password" placeholder="新的登录密码"></div>
+      <button class="btn pri" style="width:100%" onclick="forgotReset()">重置密码并登录</button>
+      <div style="margin-top:12px;"><a href="javascript:void(0)" style="font-size:12px;color:var(--brand);" onclick="authTab('pwd')">返回登录</a></div>
+    </div>
+
+    <div id="auth-msg" class="msg"></div>
+  </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tencent-ai/workbuddy-cloud-sdk@dev/lib/index.global.js"></script>
+<!-- 私有云端配置（可选）：自己建一个 config.local.js 才会启用云同步；
+     没有它也能正常用，只是不连云。该文件已被 .gitignore 排除 -->
+<script>
+// 云端配置优先级：本人在设置页填的 > 私有配置文件 > 空（空=只用本机，不连云）
+var CONFIG = { endpoint: '', publishableKey: '' };
+(function initCloudConfig(){
+  var saved = {};
+  try{ saved = JSON.parse(localStorage.getItem('deal-log-cloudcfg-v1') || '{}'); }catch(e){}
+  var local = window.LOCAL_CLOUD_CONFIG || {};  // 开源版默认为空 → 走纯本机模式
+  CONFIG.endpoint = saved.endpoint || local.endpoint || '';
+  CONFIG.publishableKey = saved.publishableKey || local.publishableKey || '';
+})();
+// 邀请码是可选门槛：只有在私有配置里写明 inviteRequired 才启用。
+// 校验靠云端的 check_invite / consume_invite 两个服务端函数，网页源码里搜不到任何码。
+var INVITE_REQUIRED = !!(window.LOCAL_CLOUD_CONFIG && LOCAL_CLOUD_CONFIG.inviteRequired);
+
+var KEY = 'deal-log-v1';
+var KEY_IND = 'deal-log-industries-v1';
+
+var DEFAULT_INDUSTRIES = ['AI应用','具身智能','机器人零部件','半导体','生物医药','医疗器械','新能源','新材料','企业软件','自动驾驶','低空经济','商业航天','量子计算','可控核聚变','脑机接口','消费','金融科技','跨境电商','其他'];
+var NEW_INDUSTRIES = ['量子计算','可控核聚变','脑机接口'];
+var IND_VER_KEY = 'deal-log-ind-ver';
+var IND_VER = 2;
+var DEFAULT_ROUNDS = ['种子轮','天使轮','Pre-A轮','A轮','A+轮','B轮','B+轮','C轮','C+轮','D轮及以后','Pre-IPO轮','并购轮','其他'];
+var KEY_ROUND = 'deal-log-rounds-v1';
+var STATUSES = ['初次接触','持续观察','深度尽调','已过投委会','已出投资意向书','已投','已放弃'];
+var SOURCES = ['融资顾问推送','已投公司推荐','朋友介绍','主动挖掘','行业会议','其他'];
+var SOURCE_DETAIL = { '融资顾问推送':'机构名称', '已投公司推荐':'公司名称', '朋友介绍':'姓名', '行业会议':'会议名称' };
+var CREDIBILITY = ['创始人自述','部分验证','已验证'];
+var SCORES = ['5','4','3','2','1'];
+var CONCERN_RESULTS = ['未验证','中了','没中','还没发生'];
+
+// 注意：concerns（我的预测）已经不在录入表单里了，但老数据里还有，
+// 读的时候照读不误，只是不再让用户填新的
+var FIELDS = ['company','industry','round','status','sourceType','sourceDetail','score','thesis','meetDate','attendees','product','competitors','revenue','financing','credibility','myView','concernResult','missReason','dropReason','nextFollow'];
+var REQUIRED = ['company','industry','round','status','sourceType','score','thesis'];
+var LABELS = {
+  company:'公司名称', industry:'行业标签', round:'融资轮次', status:'决策状态',
+  sourceType:'项目来源', score:'兴趣度', thesis:'一句话投资逻辑', meetDate:'交流日期',
+  attendees:'对方参会人及角色', product:'产品与技术', competitors:'竞争对手与差异点',
+  sourceDetail:'来源明细',
+  revenue:'收入与财务', financing:'本轮融资与估值',
+  credibility:'信息可信度', myView:'我的看法', concerns:'我的预测 · 我预计会发生什么', concernResult:'当初的预测应验了吗', missReason:'为什么没中', dropReason:'放弃原因',
+  nextFollow:'下次跟进日期'
+};
+
+var EMPTY_SVG = '<svg width="42" height="42" viewBox="0 0 40 40" fill="none"><rect x="6.5" y="9.5" width="27" height="21" rx="3" stroke="#8a929e" stroke-width="1.5"/><path d="M6.5 16h27M14.5 9.5v6.5" stroke="#8a929e" stroke-width="1.5" stroke-linecap="round"/></svg>';
+
+var SAMPLES = [
+  { company:'示例·某灵巧手公司', industry:'具身智能', round:'A轮', status:'深度尽调', sourceType:'融资顾问推送', sourceDetail:'示例机构', score:'4',
+    thesis:'灵巧手是人形机器人量产的成本卡点，他们自研六维力传感器，成本能做到同行一半',
+    attendees:'创始人、技术负责人', product:'六自由度灵巧手，自研六维力传感器与触觉算法',
+    competitors:'国外某厂商，国内若干初创；胜在成本和交付周期',
+    revenue:'去年订单约3000万，毛利40%左右', financing:'本轮融1.5亿，投前估值8亿，老股东跟投',
+    credibility:'创始人自述',
+    myView:'团队技术底子扎实，创始人对成本结构讲得很清楚，不像在编故事',
+    concerns:'客户集中度高，前两大客户占比超六成，半年内不会改善',
+    concernResult:'未验证', dropReason:'', nextFollow:'', isSample:true },
+  { company:'示例·某企业服务AI公司', industry:'AI应用', round:'Pre-A轮', status:'持续观察', sourceType:'已投公司推荐', sourceDetail:'某已投公司创始人', score:'3',
+    thesis:'垂直场景的数据壁垒比通用模型更值钱，他们在法务场景有独家语料',
+    attendees:'创始人', product:'面向律所的合同审阅助手，按条收费',
+    competitors:'几家大厂的通用产品；胜在垂直场景准确率',
+    revenue:'年化收入约800万，增长快但基数小', financing:'融3000万，投后估值2亿',
+    credibility:'部分验证',
+    myView:'产品确实有人用，但天花板待观察，容易被大厂一个功能覆盖掉',
+    concerns:'大厂随时可能下场，靠创始人关系卖不动',
+    concernResult:'中了', dropReason:'', nextFollow:'', isSample:true },
+  { company:'示例·某模拟芯片公司', industry:'半导体', round:'B轮', status:'已放弃', sourceType:'行业会议', sourceDetail:'某机构路演', score:'2',
+    thesis:'国产替代窗口期明确',
+    attendees:'创始人、财务总监', product:'高精度ADC芯片，对标国外某型号',
+    competitors:'国内外多家，价格战已经开打',
+    revenue:'收入约5000万，毛利35%', financing:'融2亿，投前估值15亿',
+    credibility:'已验证',
+    myView:'技术没问题，但估值已经把未来三年的增长提前透支了',
+    concerns:'行业打价格战，毛利还会往下走',
+    concernResult:'没中', dropReason:'估值谈不下来，同样的钱不如投更早期的标的', nextFollow:'', isSample:true }
+];
+
+function seedSamples(){
+  var list = load();
+  if(list.length > 0) return Promise.resolve(0);
+  var now = new Date().toISOString();
+  var out = [];
+  for(var i=0;i<SAMPLES.length;i++){
+    var d = { id: uid(), createdAt: now, updatedAt: now, isSample: true };
+    for(var k=0;k<FIELDS.length;k++){
+      var key = FIELDS[k];
+      d[key] = SAMPLES[i][key] === undefined ? '' : SAMPLES[i][key];
+    }
+    out.push(d);
+  }
+  save(out);
+  pushMany(out);
+  return Promise.resolve(out.length);
+}
+
+function clearSamples(){
+  var list = load();
+  var out = [];
+  var removed = [];
+  for(var i=0;i<list.length;i++){
+    if(list[i].isSample) removed.push(list[i].id);
+    else out.push(list[i]);
+  }
+  if(removed.length === 0) return;
+  save(out);
+  for(var j=0;j<removed.length;j++) removeDealCloud(removed[j]);
+  refreshAllViews();
+}
+
+function countSamples(){
+  var list = load();
+  var n = 0;
+  for(var i=0;i<list.length;i++){ if(list[i].isSample) n++; }
+  return n;
+}
+
+function todayStr(){
+  var d = new Date();
+  var m = d.getMonth() + 1;
+  var day = d.getDate();
+  return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
+}
+
+// 当初的判断：老记录里单独写过「我的预测」，新记录不再填这一栏，
+// 就以「我的看法」为准。全站只有这一个地方定义口径，改口径只改这里
+function judgeText(p){ return (p && (p.concerns || p.myView)) || ''; }
+
+function judgeStats(){
+  var list = load();
+  var done = 0, hit = 0, pending = 0;
+  for(var i=0;i<list.length;i++){
+    var p = list[i];
+    if(p.isSample || !judgeText(p)) continue;
+    var r = p.concernResult || '未验证';
+    if(r === '未验证') pending++;
+    else if(r === '中了'){ done++; hit++; }
+    else if(r === '没中'){ done++; }
+  }
+  return { done: done, hit: hit, pending: pending, rate: done ? Math.round(hit / done * 100) : 0 };
+}
+
+function renderDueCheck(){
+  var list = load();
+  var today = todayStr();
+  var due = [];
+  for(var i=0;i<list.length;i++){
+    var p = list[i];
+    if(p.isSample || !judgeText(p)) continue;
+    if(p.concernResult && p.concernResult !== '未验证') continue;
+    if(!p.nextFollow || p.nextFollow > today) continue;
+    due.push(p);
+  }
+  var card = $('due-card');
+  if(due.length === 0){ card.style.display = 'none'; return; }
+  var html = '';
+  for(var j=0;j<due.length;j++){
+    var q = due[j];
+    html += '<div class="item" style="margin-bottom:8px;">'
+      + '<div class="nm">' + esc(q.company) + '　<span style="font-weight:400;color:var(--ink3);font-size:12px;">约好' + esc(q.nextFollow) + '回头看</span></div>'
+      + '<div class="th">你当时的判断：' + esc(judgeText(q)) + '</div>'
+      + '<div class="row" style="margin-top:10px;">'
+      + '<button class="btn sm" onclick="markResult(\'' + jsAttr(q.id) + '\',\'中了\')">中了</button> '
+      + '<button class="btn sm" onclick="markResult(\'' + jsAttr(q.id) + '\',\'没中\')">没中</button> '
+      + '<button class="btn sm" onclick="markResult(\'' + jsAttr(q.id) + '\',\'还没发生\')">还没发生</button> '
+      + '<button class="btn sm" onclick="editDeal(\'' + jsAttr(q.id) + '\')">编辑</button>'
+      + '</div></div>';
+  }
+  $('due-body').innerHTML = html;
+  card.style.display = 'block';
+}
+
+function markResult(id, result){
+  var list = load();
+  var target = null;
+  for(var i=0;i<list.length;i++){
+    if(list[i].id === id){
+      list[i].concernResult = result;
+      target = list[i];
+      break;
+    }
+  }
+  if(!target) return;
+  save(list);
+  pushDeal(target);
+  refreshAllViews();
+}
+
+var editingId = null;
+var currentDealId = null;
+var currentFiles = [];      // 已上传到云端的附件引用 [{name, path}]
+var pendingFiles = [];      // 暂存在本地、待保存后上传的 File 对象 [{name, file}]
+var uploading = 0;          // 正在上传的数量
+var currentUserId = null;   // 登录后才有，本机模式为 null
+var cloudClient = null;
+var cachedModel = null;
+
+function $(id){ return document.getElementById(id); }
+// 转义 HTML。必须连引号一起转，否则自定义赛道名里带个引号就能截断 <option value="..."> 这类属性
+function esc(s){
+  return String(s === null || s === undefined ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+var CACHE = [];
+var cloudOn = false;
+var pendingUpsert = {};
+var pendingDelete = {};
+
+function readLocal(){ try{ return JSON.parse(localStorage.getItem(KEY) || '[]'); }catch(e){ return []; } }
+function writeLocal(list){ try{ localStorage.setItem(KEY, JSON.stringify(list)); }catch(e){} }
+function load(){ return CACHE; }
+function save(list){ CACHE = list; writeLocal(list); syncFile(list); }
+
+/* ---------- 桌面版：数据落成硬盘上的真实文件 ---------- */
+
+function isDesktop(){ return !!(window.desktop && window.desktop.isDesktop); }
+
+// 每次保存都顺手写一份到数据文件夹，写失败也不影响界面继续用
+function syncFile(list){
+  if(!isDesktop()) return;
+  try{ window.desktop.writeDeals(list).catch(function(){}); }catch(e){}
+}
+
+function openDataFolder(){
+  if(!isDesktop()) return;
+  try{ window.desktop.openDataFolder(); }catch(e){}
+}
+
+// 启动时先把数据文件读回来，再进本机模式
+function startDesktop(){
+  window.desktop.readDeals().then(function(list){
+    if(list && list.length){
+      writeLocal(list);
+    }else{
+      // 第一次运行：把数据文件夹和文件先建出来，好让用户点「打开数据文件夹」能直接看到
+      window.desktop.writeDeals([]).catch(function(){});
+    }
+    useOffline();
+    refreshAllViews();
+  }).catch(function(){
+    useOffline();
+    refreshAllViews();
+  });
+}
+
+function setSync(text, kind){
+  var el = $('sync-state');
+  if(!el) return;
+  el.textContent = text;
+  el.className = 'sync' + (kind ? ' ' + kind : '');
+}
+
+function refreshAllViews(){
+  renderList();
+  renderStats();
+  showRecall();
+  renderDueCheck();
+}
+
+function pullCloud(){
+  return cloudClient.database.from('deals').select('deal_id, data').order('created_at', { ascending: false })
+    .then(function(res){
+      if(res.error) throw res.error;
+      var out = [];
+      var rows = res.data || [];
+      for(var i=0;i<rows.length;i++) out.push(rows[i].data);
+      CACHE = out;
+    });
+}
+
+function pushDeal(d){
+  if(!cloudOn || !cloudClient) return;
+  setSync('同步中', 'pending');
+  cloudClient.database.from('deals')
+    .upsert({ deal_id: d.id, data: d, updated_at: new Date().toISOString() }, { onConflict: 'deal_id' })
+    .then(function(res){
+      if(res.error){ pendingUpsert[d.id] = true; setSync('未同步', 'off'); return; }
+      delete pendingUpsert[d.id];
+      setSync('已同步', '');
+    });
+}
+
+function pushMany(list){
+  if(!cloudOn || !cloudClient || list.length === 0) return;
+  setSync('同步中', 'pending');
+  var rows = [];
+  for(var i=0;i<list.length;i++) rows.push({ deal_id: list[i].id, data: list[i] });
+  cloudClient.database.from('deals').upsert(rows, { onConflict: 'deal_id' })
+    .then(function(res){
+      if(res.error){ setSync('未同步', 'off'); return; }
+      setSync('已同步', '');
+    });
+}
+
+function removeDealCloud(id){
+  if(!cloudOn || !cloudClient) return;
+  setSync('同步中', 'pending');
+  cloudClient.database.from('deals').delete().eq('deal_id', id)
+    .then(function(res){
+      if(res.error){ pendingDelete[id] = true; setSync('未同步', 'off'); return; }
+      delete pendingDelete[id];
+      setSync('已同步', '');
+    });
+}
+
+function flushPending(){
+  if(!cloudOn || !cloudClient) return;
+  var list = load();
+  var ids = Object.keys(pendingUpsert);
+  for(var i=0;i<ids.length;i++){
+    for(var j=0;j<list.length;j++){
+      if(list[j].id === ids[i]){ pushDeal(list[j]); break; }
+    }
+  }
+  var dids = Object.keys(pendingDelete);
+  for(var k=0;k<dids.length;k++) removeDealCloud(dids[k]);
+}
+
+function pullSetting(key, lsKey){
+  return cloudClient.database.from('settings').select('key, value').eq('key', key).then(function(res){
+    if(res.error) throw res.error;
+    var rows = res.data || [];
+    if(rows.length > 0 && rows[0].value && rows[0].value.length){
+      localStorage.setItem(lsKey, JSON.stringify(rows[0].value));
+    }
+  });
+}
+
+function pushSetting(key, value){
+  if(!cloudOn || !cloudClient) return Promise.resolve();
+  return cloudClient.database.from('settings').select('id').eq('key', key).then(function(res){
+    if(res.error) return null;
+    var rows = res.data || [];
+    if(rows.length === 0){
+      return cloudClient.database.from('settings').insert({ key: key, value: value });
+    }
+    return cloudClient.database.from('settings').update({ value: value, updated_at: new Date().toISOString() }).eq('key', key);
+  });
+}
+// 词表排一遍：去重、去空，「其他」永远压到最末一位
+function orderVocab(arr){
+  var out = [], seen = {};
+  for(var i=0;i<arr.length;i++){
+    var v = arr[i];
+    if(!v || seen[v]) continue;
+    seen[v] = 1; out.push(v);
+  }
+  var oi = out.indexOf('其他');
+  if(oi >= 0){ out.splice(oi, 1); out.push('其他'); }
+  return out;
+}
+function readVocab(key, fallback){
+  var raw = null;
+  try{ raw = JSON.parse(localStorage.getItem(key) || 'null'); }catch(e){ raw = null; }
+  if(raw && raw.length) return orderVocab(raw);
+  return orderVocab(fallback.slice());
+}
+// 新赛道收进词表：插到「其他」前面，而不是插到它后面
+function addToVocab(key, name, fallback){
+  if(!name || name === '其他') return false;
+  var arr = readVocab(key, fallback);
+  if(arr.indexOf(name) >= 0) return false;
+  var oi = arr.indexOf('其他');
+  if(oi < 0) arr.push(name); else arr.splice(oi, 0, name);
+  try{ localStorage.setItem(key, JSON.stringify(arr)); }catch(e){}
+  return true;
+}
+
+function industries(){
+  return readVocab(KEY_IND, DEFAULT_INDUSTRIES);
+}
+function uid(){ return 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function fillSelect(el, options, placeholder){
+  var html = '';
+  if(placeholder !== undefined && placeholder !== null) html += '<option value="">' + esc(placeholder) + '</option>';
+  for(var i=0;i<options.length;i++){
+    var o = options[i];
+    html += '<option value="' + esc(o) + '">' + esc(o) + '</option>';
+  }
+  el.innerHTML = html;
+}
+
+function rounds(){
+  return readVocab(KEY_ROUND, DEFAULT_ROUNDS);
+}
+
+function migrateIndustries(){
+  var ver = parseInt(localStorage.getItem(IND_VER_KEY) || '0', 10);
+  if(ver >= IND_VER) return;
+  var arr = industries();   // 已经排过序，「其他」在最后
+  if(!localStorage.getItem(KEY_IND)) localStorage.setItem(KEY_IND, JSON.stringify(arr));
+  for(var i=0;i<NEW_INDUSTRIES.length;i++){
+    addToVocab(KEY_IND, NEW_INDUSTRIES[i], DEFAULT_INDUSTRIES);
+  }
+  localStorage.setItem(IND_VER_KEY, String(IND_VER));
+}
+
+function initSelects(){
+  migrateIndustries();
+  fillSelect($('f-industry'), industries(), '请选择');
+  fillSelect($('f-round'), rounds(), '请选择');
+  fillSelect($('f-status'), STATUSES, '请选择');
+  fillSelect($('f-sourceType'), SOURCES, '请选择');
+  fillSelect($('f-credibility'), CREDIBILITY, '请选择');
+  fillSelect($('f-score'), SCORES, '请选择');
+  fillSelect($('f-concernResult'), CONCERN_RESULTS);
+  fillSelect($('q-industry'), industries(), '全部行业');
+  fillSelect($('q-status'), STATUSES, '全部状态');
+}
+
+function go(name){
+  var tabs = ['entry','list','stats','review','set'];
+  for(var i=0;i<tabs.length;i++){
+    $('view-' + tabs[i]).className = 'panel' + (tabs[i] === name ? ' on' : '');
+    $('tab-' + tabs[i]).className = tabs[i] === name ? 'on' : '';
+  }
+  if(name === 'list') renderList();
+  if(name === 'stats') renderStats();
+  if(name === 'review') renderReview();
+  if(name === 'set') renderSettings();
+  flushPending();
+  window.scrollTo(0,0);
+}
+
+function readForm(){
+  var d = {};
+  for(var i=0;i<FIELDS.length;i++){
+    var k = FIELDS[i];
+    var el = $('f-' + k);
+    d[k] = el ? el.value.trim() : '';
+  }
+  if(d.industry === '其他') d.industry = $('f-industryOther').value.trim();
+  if(d.round === '其他') d.round = $('f-roundOther').value.trim();
+  if(!SOURCE_DETAIL[d.sourceType]) d.sourceDetail = '';
+  if(!d.concernResult) d.concernResult = '未验证';
+  // 只有选了「没中」才需要解释为什么，选别的就把上次的解释清掉，免得留下脏数据
+  if(d.concernResult !== '没中') d.missReason = '';
+  return d;
+}
+
+// 选了「没中」才展开「为什么没中」这一栏
+function toggleMissReason(){
+  var w = $('wrap-miss');
+  if(w) w.style.display = ($('f-concernResult').value === '没中') ? 'block' : 'none';
+}
+
+function effectiveIndustry(){
+  var v = $('f-industry').value;
+  if(v === '其他') return $('f-industryOther').value.trim();
+  return v;
+}
+
+function writeForm(d){
+  for(var i=0;i<FIELDS.length;i++){
+    var k = FIELDS[i];
+    var el = $('f-' + k);
+    if(!el) continue;
+    var v = d && d[k] !== undefined && d[k] !== null ? String(d[k]) : '';
+    if(k === 'industry'){
+      $('f-industryOther').value = '';
+      if(v && industries().indexOf(v) < 0 && industries().indexOf('其他') >= 0){
+        $('f-industryOther').value = v;
+        v = '其他';
+      }
+    }
+    if(k === 'round'){
+      $('f-roundOther').value = '';
+      if(v && rounds().indexOf(v) < 0 && rounds().indexOf('其他') >= 0){
+        $('f-roundOther').value = v;
+        v = '其他';
+      }
+    }
+    if((k === 'round' || k === 'status' || k === 'sourceType' || k === 'credibility') && v){
+      var allow = k === 'round' ? rounds() : (k === 'status' ? STATUSES : (k === 'sourceType' ? SOURCES : CREDIBILITY));
+      if(allow.indexOf(v) < 0) v = '';
+    }
+    if(k === 'score' && v && SCORES.indexOf(String(v)) < 0){
+      var n = parseInt(v, 10);
+      v = (n >= 1 && n <= 5) ? String(n) : '';
+    }
+    el.value = v;
+  }
+  syncConditional();
+  toggleMissReason();
+  showRecall();
+}
+
+function clearForm(){
+  editingId = null;
+  $('raw').value = '';
+  writeForm({});
+  $('recall').style.display = 'none';
+  $('btn-ai').textContent = '智能整理';
+  currentFiles = []; pendingFiles = []; uploading = 0;
+  renderFileList();
+  msg('entry-msg','');
+}
+
+/* ---------- 资料附件（云端存储） ---------- */
+
+var CLIP_SVG = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:5px;flex:none;">'
+  + '<path d="M9.6 4.3 5.9 8a1.8 1.8 0 002.5 2.5l3.4-3.4a3.2 3.2 0 00-4.5-4.5L3.4 6.5a4.6 4.6 0 006.5 6.5l2.9-2.9" '
+  + 'stroke="#1a4e8a" stroke-width="1.3" stroke-linecap="round"/></svg>';
+
+function fileStorageReady(){
+  // 桌面版把附件存进本机数据文件夹，不需要云端
+  if(isDesktop()) return true;
+  return !!(cloudClient && cloudClient.storage && cloudClient.storage.userPath && currentUserId);
+}
+
+// 桌面版的附件是本机文件，按钮应该说「打开」而不是「下载」
+function fileActionLabel(){ return isDesktop() ? '打开' : '下载'; }
+
+function safeName(n){
+  var s = (n || 'file').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').trim();
+  return s.slice(0, 80) || 'file';
+}
+
+function jsAttr(s){
+  return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+function updateFileHint(t){
+  var el = $('file-hint');
+  if(el) el.textContent = t || '';
+}
+
+function pickFiles(){
+  if(!fileStorageReady()){
+    alert('上传附件需要登录「云端同步」模式，或者用桌面版（附件直接存进你电脑的数据文件夹）');
+    return;
+  }
+  var inp = $('file-input');
+  if(inp) inp.click();
+}
+
+function onFilesPicked(input){
+  var files = input.files;
+  input.value = '';
+  if(!files || !files.length) return;
+  if(!fileStorageReady()){
+    alert('资料上传需要登录「云端同步」模式');
+    return;
+  }
+  var tasks = [];
+  for(var i=0;i<files.length;i++){
+    var file = files[i];
+    if(editingId){
+      // 编辑已有记录：id 已确定，立即上传
+      (function(f){
+        tasks.push(uploadOne(f, editingId).then(function(ref){ if(ref) currentFiles.push(ref); }));
+      })(file);
+    }else{
+      // 新建记录：先排队，保存拿到 id 后再上传
+      pendingFiles.push({ name: file.name, file: file });
+    }
+  }
+  if(tasks.length){
+    Promise.all(tasks).then(function(){ updateFileHint(''); renderFileList(); });
+  }else{
+    renderFileList();
+  }
+}
+
+function uploadOne(file, dealId){
+  // 桌面版：复制进本机数据文件夹，秒完成
+  if(isDesktop()){
+    uploading++; updateFileHint('正在存附件…（' + uploading + '）');
+    return file.arrayBuffer().then(function(ab){
+      return window.desktop.saveAttachment(dealId, file.name, ab);
+    }).then(function(rel){
+      uploading--; updateFileHint('');
+      return { name: file.name, path: rel, local: true };
+    }).catch(function(){
+      uploading--; updateFileHint('附件「' + file.name + '」没存进去');
+      return null;
+    });
+  }
+  return new Promise(function(resolve){
+    uploading++; updateFileHint('正在上传附件…（' + uploading + '）');
+    var path = cloudClient.storage.userPath(currentUserId, 'deals/' + dealId + '/' + safeName(file.name));
+    cloudClient.storage.upload(path, file, {
+      contentType: file.type || 'application/octet-stream',
+      upsert: true
+    }).then(function(res){
+      uploading--;
+      if(res && res.error){
+        updateFileHint('附件「' + file.name + '」上传失败：' + (res.error.message || res.error));
+        resolve(null); return;
+      }
+      updateFileHint('');
+      resolve({ name: file.name, path: path });
+    }).catch(function(err){
+      uploading--;
+      updateFileHint('附件「' + file.name + '」上传出错：' + (err && err.message ? err.message : '未知错误'));
+      resolve(null);
+    });
+  });
+}
+
+function renderFileList(){
+  var box = $('file-list');
+  if(!box) return;
+  var html = '';
+  for(var i=0;i<currentFiles.length;i++){
+    var f = currentFiles[i];
+    html += '<div class="file-item"><div class="fn">' + CLIP_SVG + esc(f.name) + '</div>'
+      + '<div class="fr"><button class="btn sm" onclick="downloadFile(\'' + jsAttr(f.path) + '\',\'' + jsAttr(f.name) + '\')">' + fileActionLabel() + '</button> '
+      + '<button class="btn sm" onclick="deleteFile(\'' + jsAttr(f.path) + '\')">删除</button></div></div>';
+  }
+  for(var j=0;j<pendingFiles.length;j++){
+    var pf = pendingFiles[j];
+    html += '<div class="file-item"><div class="fn">' + CLIP_SVG + esc(pf.name)
+      + '<span class="fs">' + (isDesktop() ? '待保存（保存后存进数据文件夹）' : '待上传（保存后同步到云端）') + '</span></div>'
+      + '<div class="fr"><button class="btn sm" onclick="removePending(' + j + ')">移除</button></div></div>';
+  }
+  box.innerHTML = html;
+}
+
+function removePending(j){
+  pendingFiles.splice(j, 1);
+  renderFileList();
+}
+
+function downloadFile(path, name){
+  // 桌面版：直接用系统默认程序打开这个附件
+  if(isDesktop()){
+    window.desktop.openAttachment(path).then(function(r){
+      if(!r || !r.ok) alert('这个附件不在数据文件夹里了，可能已经被你手动删掉或挪走了');
+    }).catch(function(){ alert('打不开这个附件'); });
+    return;
+  }
+  if(!fileStorageReady()){ alert('登录云端同步模式才能下载附件'); return; }
+  cloudClient.storage.download(path).then(function(res){
+    if(!res || res.error){ alert('下载失败：' + (res.error && res.error.message ? res.error.message : res.error)); return; }
+    var blob = res.data;
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name || 'file';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  }).catch(function(err){ alert('下载出错：' + (err && err.message ? err.message : '未知错误')); });
+}
+
+function deleteFile(path){
+  var tip = isDesktop() ? '删除这个附件吗？文件会从你电脑的数据文件夹里删掉。'
+                        : '删除这个附件吗？删除后云端文件也会一并移除。';
+  if(!window.confirm(tip)) return;
+  if(isDesktop()){
+    window.desktop.deleteAttachment(path).catch(function(){});
+  }else if(fileStorageReady()){
+    cloudClient.storage.remove([path]).catch(function(){});
+  }
+  removeFileRef(path);
+}
+
+function removeFileRef(path){
+  currentFiles = currentFiles.filter(function(f){ return f.path !== path; });
+  if(editingId){
+    var list = load();
+    for(var i=0;i<list.length;i++){
+      if(list[i].id === editingId && list[i].files){
+        list[i].files = list[i].files.filter(function(f){ return f.path !== path; });
+        save(list); pushDeal(list[i]);
+        break;
+      }
+    }
+  }
+  renderFileList();
+}
+
+function syncConditional(){
+  $('wrap-drop').style.display = $('f-status').value === '已放弃' ? 'block' : 'none';
+  $('wrap-ind-other').style.display = $('f-industry').value === '其他' ? 'block' : 'none';
+  $('wrap-round-other').style.display = $('f-round').value === '其他' ? 'block' : 'none';
+  var ph = SOURCE_DETAIL[$('f-sourceType').value];
+  $('wrap-source-detail').style.display = ph ? 'block' : 'none';
+  if(ph) $('f-sourceDetail').placeholder = ph;
+}
+
+function msg(id, text, kind){
+  var el = $(id);
+  if(!text){ el.className = 'msg'; el.innerHTML = ''; return; }
+  el.className = 'msg show ' + (kind || 'info');
+  el.innerHTML = esc(text);
+}
+
+function validate(d){
+  var miss = [];
+  for(var i=0;i<REQUIRED.length;i++){
+    if(!d[REQUIRED[i]]) miss.push(LABELS[REQUIRED[i]]);
+  }
+  return miss;
+}
+
+function saveEntry(){
+  if($('f-industry').value === '其他' && !$('f-industryOther').value.trim()){
+    msg('entry-msg', '选了其他，请填写具体赛道名称', 'err');
+    return;
+  }
+  if($('f-round').value === '其他' && !$('f-roundOther').value.trim()){
+    msg('entry-msg', '选了其他，请填写具体融资轮次', 'err');
+    return;
+  }
+  var d = readForm();
+  var miss = validate(d);
+  if(miss.length){
+    msg('entry-msg', '还差这些必填项：' + miss.join('、'), 'err');
+    return;
+  }
+  addToVocab(KEY_IND, d.industry, DEFAULT_INDUSTRIES);
+  addToVocab(KEY_ROUND, d.round, DEFAULT_ROUNDS);
+  var list = load();
+  var now = new Date().toISOString();
+  if(editingId){
+    for(var i=0;i<list.length;i++){
+      if(list[i].id === editingId){
+        d.id = editingId; d.createdAt = list[i].createdAt; d.updatedAt = now;
+        d.files = currentFiles.slice();
+        // 这两项表单里已经没有输入框了，编辑时要从原记录继承，不能给抹掉
+        d.concerns = list[i].concerns || '';
+        d.rawNote = list[i].rawNote || '';
+        list[i] = d; break;
+      }
+    }
+    editingId = null;
+    $('btn-ai').textContent = '智能整理';
+  }else{
+    d.id = uid(); d.createdAt = now; d.updatedAt = now;
+    d.rawNote = $('raw').value.trim();
+    d.files = [];
+    list.unshift(d);
+  }
+  save(list);
+  pushDeal(d);
+  initSelects();
+  pushSetting('industries', industries());
+  pushSetting('rounds', rounds());
+  if(pendingFiles.length && fileStorageReady()){
+    var queue = pendingFiles.slice();
+    pendingFiles = [];
+    msg('entry-msg', isDesktop()
+      ? '已保存，正在把 ' + queue.length + ' 个附件存进数据文件夹…'
+      : '已保存，正在同步 ' + queue.length + ' 个附件到云端…', 'info');
+    Promise.all(queue.map(function(pf){
+      return uploadOne(pf.file, d.id).then(function(ref){ if(ref) currentFiles.push(ref); });
+    })).then(function(){
+      var l2 = load();
+      for(var k=0;k<l2.length;k++){ if(l2[k].id === d.id){ l2[k].files = currentFiles.slice(); break; } }
+      d.files = currentFiles.slice();
+      save(l2); pushDeal(d);
+      finalizeEntry(l2.length);
+    });
+  }else{
+    finalizeEntry(list.length);
+  }
+}
+
+function finalizeEntry(n){
+  msg('entry-msg', '已保存，共' + n + '条项目记录', 'ok');
+  $('raw').value = '';
+  writeForm({});
+  $('recall').style.display = 'none';
+  currentFiles = []; pendingFiles = []; uploading = 0;
+  updateFileHint('');
+  renderFileList();
+}
+
+function showRecall(){
+  var ind = effectiveIndustry();
+  var box = $('recall');
+  var body = $('recall-body');
+  if(!ind){ box.style.display = 'none'; return; }
+  var list = load();
+  var same = [];
+  for(var i=0;i<list.length;i++){
+    if(list[i].industry === ind && list[i].id !== editingId) same.push(list[i]);
+  }
+  if(same.length === 0){ box.style.display = 'none'; return; }
+  var html = '';
+  var max = same.length > 4 ? 4 : same.length;
+  for(var j=0;j<max;j++){
+    var p = same[j];
+    var txt = '';
+    if(p.myView) txt += '看法：' + p.myView;
+    if(p.concerns) txt += (txt ? ' ／ ' : '') + '疑虑：' + p.concerns;
+    if(p.dropReason) txt += (txt ? ' ／ ' : '') + '放弃原因：' + p.dropReason;
+    html += '<div class="i"><b>' + esc(p.company) + '</b>　' + esc(p.round) + '　' + esc(p.status)
+      + '　兴趣' + esc(p.score) + '分<br>' + esc(txt || '（当时没写判断）') + '</div>';
+  }
+  if(same.length > max) html += '<div class="i">……还有' + (same.length - max) + '个同赛道项目</div>';
+  body.innerHTML = html;
+  box.style.display = 'block';
+}
+
+function editDeal(id){
+  var list = load();
+  for(var i=0;i<list.length;i++){
+    if(list[i].id === id){
+      writeForm(list[i]); editingId = id;
+      currentFiles = (list[i].files && list[i].files.length) ? list[i].files.slice() : [];
+      pendingFiles = []; uploading = 0;
+      renderFileList();
+      break;
+    }
+  }
+  $('btn-ai').textContent = '重新智能整理';
+  go('entry');
+  msg('entry-msg', '正在编辑：' + readForm().company + '，改完记得点保存', 'info');
+}
+
+function removeDeal(id){
+  if(!window.confirm('确定删掉这条记录吗？删了就找不回来了。')) return;
+  var list = load();
+  var target = null;
+  var out = [];
+  for(var i=0;i<list.length;i++){ if(list[i].id === id) target = list[i]; else out.push(list[i]); }
+  if(target && target.files && target.files.length){
+    if(isDesktop()){
+      for(var k=0;k<target.files.length;k++){
+        window.desktop.deleteAttachment(target.files[k].path).catch(function(){});
+      }
+    }else if(fileStorageReady()){
+      var paths = target.files.map(function(f){ return f.path; });
+      cloudClient.storage.remove(paths).catch(function(){});
+    }
+  }
+  save(out);
+  removeDealCloud(id);
+  renderList();
+}
+
+function renderList(){
+  var list = load();
+  var q = $('q').value.trim().toLowerCase();
+  var qi = $('q-industry').value;
+  var qs = $('q-status').value;
+  var out = [];
+  for(var i=0;i<list.length;i++){
+    var d = list[i];
+    if(qi && d.industry !== qi) continue;
+    if(qs && d.status !== qs) continue;
+    if(q){
+      var hay = [d.company, d.product, d.myView, d.thesis, d.competitors, d.concerns, d.attendees].join(' ').toLowerCase();
+      if(hay.indexOf(q) < 0) continue;
+    }
+    out.push(d);
+  }
+  var body = $('list-body');
+  if(out.length === 0){
+    body.innerHTML = '<div class="empty">' + EMPTY_SVG + '<div>'
+      + (list.length ? '没有符合条件的项目' : '还没有记录，去录入页加第一条') + '</div></div>';
+    return;
+  }
+  var html = '';
+  var sc = countSamples();
+  if(sc > 0){
+    html += '<div class="sample-bar"><span>示例数据 ' + sc + ' 条</span>'
+      + '<button class="btn sm" onclick="clearSamples()">清空</button></div>';
+  }
+  for(var j=0;j<out.length;j++){
+    var p = out[j];
+    var cls = 'chip';
+    if(p.status === '已投') cls = 'chip g';
+    else if(p.status === '已放弃') cls = 'chip r';
+    else if(p.status === '深度尽调' || p.status === '已过投委会' || p.status === '已出投资意向书') cls = 'chip w';
+    html += '<div class="item"><div class="h"><div>'
+      + '<div class="nm">' + esc(p.company) + '</div>'
+      + '<div class="meta">' + esc(p.meetDate || '未填日期') + '　来源：' + esc(p.sourceType)
+      + (p.sourceDetail ? ' · ' + esc(p.sourceDetail) : '') + '　兴趣' + esc(p.score) + '分</div>'
+      + '</div><div style="text-align:right;white-space:nowrap;">'
+      + '<button class="btn sm" onclick="editDeal(\'' + jsAttr(p.id) + '\')">编辑</button> '
+      + '<button class="btn sm" onclick="removeDeal(\'' + jsAttr(p.id) + '\')">删除</button>'
+      + '</div></div>'
+      + '<div class="chips">' + (p.isSample ? '<span class="chip">示例</span>' : '')
+      + '<span class="chip b">' + esc(p.industry) + '</span><span class="chip">' + esc(p.round) + '</span><span class="' + cls + '">' + esc(p.status) + '</span></div>';
+    if(p.thesis) html += '<div class="th"><b>逻辑：</b>' + esc(p.thesis) + '</div>';
+    if(p.myView) html += '<div class="th"><b>看法：</b>' + esc(p.myView) + '</div>';
+    var jt = judgeText(p);
+    if(jt) html += '<div class="th"><b>判断：</b>' + esc(jt)
+      + (p.concernResult && p.concernResult !== '未验证' ? '　<b>结果：' + esc(p.concernResult) + '</b>' : '') + '</div>';
+    if(p.concernResult === '没中' && p.missReason){
+      html += '<div class="th"><b>为什么没中：</b>' + esc(p.missReason) + '</div>';
+    }
+    if(p.dropReason) html += '<div class="th"><b>放弃原因：</b>' + esc(p.dropReason) + '</div>';
+    if(p.files && p.files.length){
+      html += '<div class="th files-inline"><b>附件：</b>';
+      for(var fi=0; fi<p.files.length; fi++){
+        var f = p.files[fi];
+        html += '<a class="flink" onclick="downloadFile(\'' + jsAttr(f.path) + '\',\'' + jsAttr(f.name) + '\')">'
+          + esc(f.name) + '</a>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  body.innerHTML = html;
+}
+
+function exportData(){
+  var data = { version: 1, exportedAt: new Date().toISOString(), deals: load(), industries: industries() };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '投资项目记录备份_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+function importData(input){
+  var file = input.files && input.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var data = JSON.parse(reader.result);
+      if(!data || !data.deals) throw new Error('bad');
+      var cur = load();
+      var map = {};
+      for(var i=0;i<cur.length;i++) map[cur[i].id] = cur[i];
+      for(var j=0;j<data.deals.length;j++){
+        var d = data.deals[j];
+        if(!d.id) d.id = uid();
+        map[d.id] = d;
+      }
+      var out = [];
+      for(var k in map){ if(Object.prototype.hasOwnProperty.call(map,k)) out.push(map[k]); }
+      save(out);
+      pushMany(out);
+      if(data.industries && data.industries.length) localStorage.setItem(KEY_IND, JSON.stringify(orderVocab(data.industries)));
+      initSelects();
+      renderList();
+      alert('导入成功，当前共' + out.length + '条记录');
+    }catch(e){
+      alert('这个文件读不出来，请确认是本机导出的备份文件');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ---------- 表格导出 / 导入 ----------
+// 导出的列：跟着录入表单走，导入时也是认这几列
+var CSV_COLS = ['company','industry','round','status','sourceType','sourceDetail','score','thesis',
+  'meetDate','attendees','product','competitors','revenue','financing','credibility',
+  'myView','concerns','concernResult','missReason','dropReason','nextFollow'];
+
+// 单元格转义。顺手挡一下表格软件的公式注入：
+// 单元格以 = + - @ 开头时，Excel 会当公式执行，前面加个单引号逼它当文本
+function csvCell(v){
+  var s = String(v === null || v === undefined ? '' : v);
+  if(/^[=+\-@]/.test(s)) s = "'" + s;
+  if(/[",\n\r]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+function exportCSV(){
+  var list = load();
+  if(!list.length){ alert('还没有记录，没什么可导出的'); return; }
+  var head = [];
+  for(var i=0;i<CSV_COLS.length;i++) head.push(csvCell(LABELS[CSV_COLS[i]] || CSV_COLS[i]));
+  var rows = [head.join(',')];
+  for(var j=0;j<list.length;j++){
+    var line = [];
+    for(var k=0;k<CSV_COLS.length;k++) line.push(csvCell(list[j][CSV_COLS[k]]));
+    rows.push(line.join(','));
+  }
+  // 前面加 BOM，不然 Excel 打开中文全是乱码
+  var blob = new Blob(['\ufeff' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '投资项目记录_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 3000);
+}
+
+// 手写 CSV 解析：要处理引号里包着逗号和换行的情况，Excel 导出来的文件全是这种
+function parseCSV(text){
+  if(text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  var rows = [], row = [], cur = '', inQ = false, i, c;
+  for(i=0;i<text.length;i++){
+    c = text.charAt(i);
+    if(inQ){
+      if(c === '"'){
+        if(text.charAt(i+1) === '"'){ cur += '"'; i++; }
+        else inQ = false;
+      }else cur += c;
+    }else{
+      if(c === '"') inQ = true;
+      else if(c === ','){ row.push(cur); cur = ''; }
+      else if(c === '\n'){ row.push(cur); rows.push(row); row = []; cur = ''; }
+      else if(c !== '\r') cur += c;
+    }
+  }
+  if(cur !== '' || row.length){ row.push(cur); rows.push(row); }
+  var out = [];
+  for(i=0;i<rows.length;i++){
+    var empty = true;
+    for(var j=0;j<rows[i].length;j++){ if(String(rows[i][j]).trim() !== ''){ empty = false; break; } }
+    if(!empty) out.push(rows[i]);
+  }
+  return out;
+}
+
+// 表头可能是中文标签，也可能是英文字段名，两种都认
+function headToKey(h){
+  var s = String(h || '').trim();
+  if(!s) return '';
+  for(var i=0;i<CSV_COLS.length;i++){
+    if(s === CSV_COLS[i]) return CSV_COLS[i];
+    if(s === (LABELS[CSV_COLS[i]] || '')) return CSV_COLS[i];
+  }
+  return '';
+}
+
+var csvPending = null;
+
+function importCSV(input){
+  var file = input.files && input.files[0];
+  input.value = '';
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    var rows = parseCSV(String(reader.result));
+    if(rows.length < 2){
+      csvMsg('这个文件里没读到内容，请确认是逗号分隔的表格文件', 'err');
+      return;
+    }
+    var head = rows[0];
+    var map = {}, found = 0;
+    for(var i=0;i<head.length;i++){
+      var key = headToKey(head[i]);
+      if(key){ map[i] = key; found++; }
+    }
+    if(!found || !hasVal(map, 'company')){
+      csvMsg('表头里没认出「公司名称」这一列。导出的表格带表头，照着那份填就行。', 'err');
+      return;
+    }
+    var deals = [];
+    for(var r=1;r<rows.length;r++){
+      var d = {};
+      for(var c=0;c<rows[r].length;c++){
+        if(!map[c]) continue;
+        var v = String(rows[r][c] === undefined ? '' : rows[r][c]).trim();
+        // 导出时给公式加的保护符，导入时去掉
+        if(v.charAt(0) === "'" && v.length > 1 && /^[=+\-@]/.test(v.slice(1))) v = v.slice(1);
+        d[map[c]] = v;
+      }
+      if(!d.company) continue;
+      if(!d.concernResult) d.concernResult = '未验证';
+      deals.push(d);
+    }
+    if(!deals.length){
+      csvMsg('没读到有公司名的行', 'err');
+      return;
+    }
+    csvPending = deals;
+    renderCsvPreview(deals, found);
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function hasVal(obj, val){
+  for(var k in obj){ if(Object.prototype.hasOwnProperty.call(obj,k) && obj[k] === val) return true; }
+  return false;
+}
+
+function renderCsvPreview(deals, colCount){
+  var cur = load();
+  var byName = {};
+  for(var i=0;i<cur.length;i++) byName[String(cur[i].company || '').trim()] = cur[i];
+  var add = 0, update = 0;
+  var seen = {};
+  for(var j=0;j<deals.length;j++){
+    var nm = deals[j].company;
+    if(seen[nm]){ add++; continue; }
+    seen[nm] = 1;
+    if(byName[nm]) update++; else add++;
+  }
+  var preview = deals.slice(0, 6).map(function(d){ return esc(d.company); }).join('、');
+  var html = '<div class="msg info show" style="margin-bottom:12px;">'
+    + '<div style="font-weight:600;margin-bottom:6px;">读到' + deals.length + '条，认出' + colCount + '列</div>'
+    + '<div style="color:var(--ink2);">其中 ' + update + '条公司名已存在会覆盖更新，' + add + '条会新增。</div>'
+    + '<div style="color:var(--ink3);margin-top:5px;">' + preview + (deals.length > 6 ? ' 等' + deals.length + '家' : '') + '</div>'
+    + '<div class="row" style="margin-top:11px;">'
+    + '<button class="btn pri sm" onclick="confirmCsv()">确认导入</button>'
+    + '<button class="btn sm" onclick="cancelCsv()">取消</button>'
+    + '</div></div>';
+  $('csv-preview').innerHTML = html;
+}
+
+function cancelCsv(){
+  csvPending = null;
+  $('csv-preview').innerHTML = '';
+}
+
+function confirmCsv(){
+  if(!csvPending) return;
+  var cur = load();
+  var byName = {};
+  for(var i=0;i<cur.length;i++) byName[String(cur[i].company || '').trim()] = cur[i];
+  var now = new Date().toISOString();
+  var added = 0, updated = 0;
+  for(var j=0;j<csvPending.length;j++){
+    var d = csvPending[j];
+    var exist = byName[d.company];
+    if(exist){
+      for(var k=0;k<FIELDS.length;k++){
+        var f = FIELDS[k];
+        if(d[f] !== undefined && d[f] !== '') exist[f] = d[f];
+      }
+      exist.updatedAt = now;
+      updated++;
+    }else{
+      d.id = uid();
+      // 表格里没填的必填字段在这里兜底，不然列表里会出现状态空白的记录
+      if(!d.concernResult) d.concernResult = '未验证';
+      d.createdAt = now;
+      d.updatedAt = now;
+      d.files = [];
+      cur.unshift(d);
+      byName[d.company] = d;
+      added++;
+    }
+    // 表格里出现的新赛道、新轮次，顺手收进词表（一样插在「其他」前面）
+    addToVocab(KEY_IND, d.industry, DEFAULT_INDUSTRIES);
+    addToVocab(KEY_ROUND, d.round, DEFAULT_ROUNDS);
+  }
+  save(cur);
+  pushMany(cur);
+  initSelects();
+  renderList();
+  csvPending = null;
+  $('csv-preview').innerHTML = '';
+  alert('导入完成：新增' + added + '条，更新' + updated + '条，当前共' + cur.length + '条');
+}
+
+function csvMsg(text, kind){
+  $('csv-preview').innerHTML = '<div class="msg ' + kind + ' show">' + esc(text) + '</div>';
+}
+
+function countBy(list, key){
+  var m = {};
+  for(var i=0;i<list.length;i++){
+    var v = list[i][key] || '未填';
+    m[v] = (m[v] || 0) + 1;
+  }
+  var arr = [];
+  for(var k in m){ if(Object.prototype.hasOwnProperty.call(m,k)) arr.push({ name:k, value:m[k] }); }
+  arr.sort(function(a,b){ return b.value - a.value; });
+  return arr;
+}
+
+function drawBars(elId, arr, total){
+  var el = $(elId);
+  if(!total){ el.innerHTML = '<div class="empty">暂无数据</div>'; return; }
+  var html = '';
+  for(var i=0;i<arr.length;i++){
+    var pct = Math.round(arr[i].value / total * 1000) / 10;
+    html += '<div class="bar"><div class="top"><span>' + esc(arr[i].name) + '</span>'
+      + '<span class="v">' + arr[i].value + '个 · ' + pct + '%</span></div>'
+      + '<div class="track"><div class="fill" style="width:' + pct + '%"></div></div></div>';
+  }
+  el.innerHTML = html;
+}
+
+function renderStats(){
+  var list = load();
+  var n = list.length;
+  var invested = 0, deep = 0, sum = 0, cnt = 0;
+  for(var i=0;i<list.length;i++){
+    if(list[i].status === '已投') invested++;
+    if(['深度尽调','已过投委会','已出投资意向书','已投'].indexOf(list[i].status) >= 0) deep++;
+    var s = parseInt(list[i].score, 10);
+    if(s >= 1 && s <= 5){ sum += s; cnt++; }
+  }
+  var avg = cnt ? (Math.round(sum / cnt * 10) / 10) : 0;
+  var js = judgeStats();
+  var m = [
+    { n: n, l: '项目总数' },
+    { n: invested, l: '已投' },
+    { n: deep, l: '进入深度尽调及以上' },
+    { n: avg, l: '平均兴趣度' },
+    { n: js.done ? js.rate + '%' : '—', l: '预测准确率 · 已验证' + js.done + '次' },
+    { n: js.pending, l: '待验证' }
+  ];
+  var mh = '';
+  for(var j=0;j<m.length;j++) mh += '<div class="metric"><div class="n">' + m[j].n + '</div><div class="l">' + m[j].l + '</div></div>';
+  $('metrics').innerHTML = mh;
+  drawBars('c-industry', countBy(list, 'industry'), n);
+  drawBars('c-round', countBy(list, 'round'), n);
+  drawBars('c-status', countBy(list, 'status'), n);
+  drawBars('c-source', countBy(list, 'sourceType'), n);
+  renderIndustries();
+}
+
+/* ---------- 复盘：同赛道横评 与 季度回顾 ---------- */
+
+function statusTone(s){
+  if(s === '已投') return 'g';
+  if(s === '已放弃') return 'r';
+  if(s === '深度尽调' || s === '已过投委会' || s === '已出投资意向书') return 'b';
+  if(s === '持续观察') return 'w';
+  return 'n';
+}
+function resultTone(r){
+  if(r === '中了') return 'g';
+  if(r === '没中') return 'r';
+  if(r === '还没发生') return 'w';
+  return 'n';
+}
+function metricCard(n, l){
+  return '<div class="metric"><div class="n">' + n + '</div><div class="l">' + l + '</div></div>';
+}
+function cell(v){
+  var s = String(v === undefined || v === null ? '' : v).trim();
+  return s ? esc(s) : '<span class="none">—</span>';
+}
+// 长段落先夹到 6 行，想看完点「展开全文」。这样一行里写了几千字也不会把整张表撑变形
+function cellClamp(v){
+  var s = String(v === undefined || v === null ? '' : v).trim();
+  if(!s) return '<span class="none">—</span>';
+  return '<div class="clampbox"><div class="clamped">' + esc(s) + '</div>'
+    + '<button type="button" class="morebtn" onclick="toggleClamp(this)">展开全文</button></div>';
+}
+function toggleClamp(btn){
+  var box = btn.parentNode;
+  var open = box.className.indexOf('open') >= 0;
+  box.className = open ? 'clampbox' : 'clampbox open';
+  btn.textContent = open ? '展开全文' : '收起';
+  fitClamps();
+}
+// 短内容本来就没被夹住，把那个多余的「展开全文」收掉
+function fitClamps(){
+  var boxes = document.querySelectorAll('.clampbox');
+  for(var i=0;i<boxes.length;i++){
+    var b = boxes[i];
+    if(b.className.indexOf('open') >= 0) continue;
+    var inner = b.firstChild, btn = b.querySelector('.morebtn');
+    if(!inner || !btn) continue;
+    if(inner.scrollHeight <= inner.clientHeight + 1) btn.style.display = 'none';
+  }
+}
+function avgScore(list){
+  var sum = 0, cnt = 0;
+  for(var i=0;i<list.length;i++){
+    var s = parseInt(list[i].score, 10);
+    if(s >= 1 && s <= 5){ sum += s; cnt++; }
+  }
+  return cnt ? (Math.round(sum / cnt * 10) / 10) : 0;
+}
+function realDeals(){
+  var out = [], list = load();
+  for(var i=0;i<list.length;i++){ if(!list[i].isSample) out.push(list[i]); }
+  return out;
+}
+// 在一个小范围里重算预测命中率，跟全局那套口径保持一致
+function hitRateOf(list){
+  var done = 0, hit = 0;
+  for(var i=0;i<list.length;i++){
+    if(!judgeText(list[i])) continue;
+    var r = list[i].concernResult || '未验证';
+    if(r === '中了'){ done++; hit++; }
+    else if(r === '没中'){ done++; }
+  }
+  return { done: done, rate: done ? Math.round(hit / done * 100) : 0 };
+}
+
+var CMP_COLS = [
+  { k:'round',     t:'轮次',   w:'num' },
+  { k:'status',    t:'状态',   w:'pill' },
+  { k:'score',     t:'兴趣度', w:'num' },
+  { k:'financing', t:'本轮融资与估值', w:'' },
+  { k:'thesis',    t:'一句话投资逻辑', w:'' },
+  { k:'myView',    t:'我的看法', w:'' }
+];
+
+function renderReview(){
+  renderCompare();
+  renderQuarter();
+}
+
+function renderCompare(){
+  var sel = $('rv-industry');
+  var counts = countBy(realDeals(), 'industry');
+  var names = [];
+  for(var i=0;i<counts.length;i++){ if(counts[i].name !== '未填') names.push(counts[i].name); }
+  var keep = sel.value;
+  fillSelect(sel, names, '全部赛道');
+  // 第一次进来默认停在看得最多的那个赛道；之后尊重用户的选择，包括"全部赛道"这一项
+  if(sel.getAttribute('data-init') !== '1'){
+    sel.value = names.length ? names[0] : '';
+    sel.setAttribute('data-init', '1');
+  }else if(keep === '' || names.indexOf(keep) >= 0){
+    sel.value = keep;
+  }else if(names.length){
+    sel.value = names[0];
+  }
+
+  var ind = sel.value;
+  var all = realDeals();
+  var list = [];
+  for(var j=0;j<all.length;j++){
+    if(ind && all[j].industry !== ind) continue;
+    list.push(all[j]);
+  }
+  list.sort(function(a,b){
+    var sa = parseInt(a.score, 10) || 0, sb = parseInt(b.score, 10) || 0;
+    if(sb !== sa) return sb - sa;
+    return String(b.meetDate || '').localeCompare(String(a.meetDate || ''));
+  });
+
+  var invested = 0;
+  for(var k=0;k<list.length;k++){ if(list[k].status === '已投') invested++; }
+  var hr = hitRateOf(list);
+  // 选了「全部赛道」时就不能说「这个赛道」了，免得数字和说法对不上
+  var scopeWord = ind ? '这个赛道共看过' : '全部记录共';
+  $('cmp-metrics').innerHTML =
+      metricCard(list.length, scopeWord)
+    + metricCard(invested, '已投')
+    + metricCard(avgScore(list) || '—', '平均兴趣度')
+    + metricCard(hr.done ? hr.rate + '%' : '—', '预测命中 · 已验' + hr.done + '次');
+
+  $('cmp-ai').innerHTML = '';
+  msg('cmp-msg', '');
+
+  if(!list.length){
+    $('cmp-body').innerHTML = '<div class="empty">' + EMPTY_SVG + '<div>这个赛道还没有记录</div></div>';
+    $('btn-cmp-ai').disabled = true;
+    return;
+  }
+  $('btn-cmp-ai').disabled = false;
+
+  var LONG_COLS = { financing:1, thesis:1, myView:1 };
+  var html = '<div class="tbl-wrap"><table class="tbl tbl-cmp"><colgroup>'
+    + '<col class="c1"><col class="c2"><col class="c3"><col class="c4">'
+    + '<col class="c5"><col class="c6"><col class="c7"><col class="c8">'
+    + '</colgroup><thead><tr><th>公司</th>';
+  for(var c=0;c<CMP_COLS.length;c++) html += '<th>' + esc(CMP_COLS[c].t) + '</th>';
+  html += '<th>我的判断 · 结果</th></tr></thead><tbody>';
+
+  for(var r=0;r<list.length;r++){
+    var p = list[r];
+    html += '<tr><td class="cmp">' + esc(p.company) + '</td>';
+    for(var c2=0;c2<CMP_COLS.length;c2++){
+      var col = CMP_COLS[c2];
+      var v = p[col.k];
+      if(col.w === 'pill'){
+        html += '<td>' + (v ? '<span class="pill ' + statusTone(v) + '">' + esc(v) + '</span>' : '<span class="none">—</span>') + '</td>';
+      }else{
+        html += '<td class="cell' + (col.w ? ' ' + col.w : '') + '">'
+          + (LONG_COLS[col.k] ? cellClamp(v) : cell(v)) + '</td>';
+      }
+    }
+    var res = p.concernResult || '未验证';
+    var jt = judgeText(p);
+    html += '<td class="cell">' + (jt ? cellClamp(jt) : '<span class="none">没写判断</span>');
+    if(jt) html += '<div style="margin-top:6px;"><span class="pill ' + resultTone(res) + '">' + esc(res) + '</span></div>';
+    if(res === '没中' && p.missReason){
+      html += '<div style="margin-top:5px;font-size:12px;color:var(--ink3);">为什么没中：' + esc(p.missReason) + '</div>';
+    }
+    html += '</td></tr>';
+  }
+  html += '</tbody></table></div>';
+  $('cmp-body').innerHTML = html;
+  fitClamps();
+}
+
+function aiCompare(){
+  var sel = $('rv-industry');
+  var ind = sel.value;
+  var all = realDeals();
+  var list = [];
+  for(var i=0;i<all.length;i++){
+    if(ind && all[i].industry !== ind) continue;
+    list.push(all[i]);
+  }
+  if(list.length < 2){
+    msg('cmp-msg', '至少要两家同赛道的公司才好横评', 'err');
+    return;
+  }
+  var btn = $('btn-cmp-ai');
+  btn.disabled = true;
+  btn.textContent = '分析中…';
+  msg('cmp-msg', '正在通读这个赛道的记录', 'info');
+  $('cmp-ai').innerHTML = '';
+
+  var brief = [];
+  for(var j=0;j<list.length;j++){
+    var p = list[j];
+    brief.push('【' + (j+1) + '】公司：' + p.company + '｜轮次：' + p.round + '｜状态：' + p.status
+      + '｜兴趣度：' + p.score + '｜来源：' + p.sourceType
+      + '\n  投资逻辑：' + (p.thesis || '无')
+      + '\n  产品技术：' + (p.product || '无')
+      + '\n  竞争对手：' + (p.competitors || '无')
+      + '\n  收入财务：' + (p.revenue || '无')
+      + '\n  融资估值：' + (p.financing || '无')
+      + '\n  我的看法：' + (p.myView || '无')
+      + '\n  我的判断：' + (judgeText(p) || '无') + '（结果：' + (judgeText(p) ? (p.concernResult || '未验证') : '无') + '）'
+      + (p.missReason ? '\n  为什么没中：' + p.missReason : '')
+      + (p.dropReason ? '\n  放弃原因：' + p.dropReason : ''));
+  }
+  var system = '你是一位资深投资机构的合夥人，正在帮一位投资人做同赛道横向比较。'
+    + '你会基于他真实的项目记录给出诚实、具体、有观点的比较，不用套话，不吹捧，'
+    + '不允许编造记录里没有的信息；记录里没写的维度就直说没写。用中文回答，小标题分段。';
+  var user = '这位投资人在「' + (ind || '全部赛道') + '」看过' + list.length + '家公司，记录如下：\n\n'
+    + brief.join('\n\n')
+    + '\n\n请做一份横向比较，包含：\n'
+    + '1. 一句话总览：这个赛道他到底在下什么注\n'
+    + '2. 逐家点评：每家公司两段以内，说清楚相对位置（谁更贵、谁更早期、谁卡在哪）\n'
+    + '3. 关键差异：把这几家真正拉开差距的地方挑出来，最多三条\n'
+    + '4. 共同风险：这个赛道共有的、容易被忽略的风险\n'
+    + '5. 记录缺口：想做判断还缺哪些信息，需要回去补问创始人什么\n'
+    + '6. 如果只能再深入看一家，选哪家，为什么\n'
+    + '注意：只做比较和分析，不要给任何买卖建议，也不要推荐该投什么。';
+
+  llmCall(system, user, false).then(function(text){
+    $('cmp-ai').innerHTML = esc(text).replace(/\n/g, '<br>');
+    msg('cmp-msg', '横评完成', 'ok');
+  }).catch(function(e){
+    msg('cmp-msg', errText(e), 'err');
+  }).then(function(){
+    btn.disabled = false;
+    btn.textContent = '让模型写一段横评';
+  });
+}
+
+/* ---------- 复盘：季度回顾 与 时间胶囊 ---------- */
+
+function quarterOf(iso){
+  var d = new Date(iso);
+  if(isNaN(d.getTime())) return null;
+  return { y: d.getFullYear(), q: Math.floor(d.getMonth() / 3) + 1 };
+}
+function quarterLabel(o){ return o.y + '年Q' + o.q; }
+// 把季度往前推几个月，用来找"半年前/一年前的那个季度"
+function shiftQuarter(o, months){
+  var mi = o.y * 12 + (o.q - 1) * 3 - months;
+  var y = Math.floor(mi / 12);
+  var q = Math.floor((mi - y * 12) / 3) + 1;
+  return { y: y, q: q };
+}
+function quarterOptions(){
+  var seen = {}, list = realDeals();
+  for(var i=0;i<list.length;i++){
+    var o = quarterOf(list[i].createdAt || list[i].meetDate);
+    if(o) seen[quarterLabel(o)] = o;
+  }
+  var arr = [];
+  for(var k in seen){ if(Object.prototype.hasOwnProperty.call(seen,k)) arr.push(k); }
+  arr.sort(function(a,b){ return b.localeCompare(a); });
+  return arr;
+}
+
+function renderQuarter(){
+  var sel = $('rv-quarter');
+  var opts = quarterOptions();
+  var keep = sel.value;
+  fillSelect(sel, opts);
+  if(keep && opts.indexOf(keep) >= 0) sel.value = keep;
+  else if(opts.length) sel.value = opts[0];
+
+  if(!opts.length){
+    $('q-metrics').innerHTML = '';
+    $('q-body').innerHTML = '<div class="empty">' + EMPTY_SVG + '<div>还没有记录，攒几条再来看回顾</div></div>';
+    return;
+  }
+
+  var cur = sel.value;
+  var list = realDeals();
+  var inQ = [];
+  for(var i=0;i<list.length;i++){
+    var o = quarterOf(list[i].createdAt || list[i].meetDate);
+    if(o && quarterLabel(o) === cur) inQ.push(list[i]);
+  }
+  var deep = 0, invested = 0;
+  for(var j=0;j<inQ.length;j++){
+    if(['深度尽调','已过投委会','已出投资意向书','已投'].indexOf(inQ[j].status) >= 0) deep++;
+    if(inQ[j].status === '已投') invested++;
+  }
+  var hr = hitRateOf(inQ);
+  $('q-metrics').innerHTML =
+      metricCard(inQ.length, '这季度新增')
+    + metricCard(deep, '推进到深度尽调及以上')
+    + metricCard(invested, '已投')
+    + metricCard(avgScore(inQ) || '—', '平均兴趣度')
+    + metricCard(hr.done ? hr.rate + '%' : '—', '预测命中 · 已验' + hr.done + '次');
+
+  // 时间胶囊：回到 N 个月前的那个季度，看看当时写下的话，以及后来应验了没有
+  var months = parseInt($('rv-lookback').value, 10) || 12;
+  var base = { y: parseInt(cur.slice(0,4), 10), q: parseInt(cur.slice(-1), 10) };
+  var back = shiftQuarter(base, months);
+  var backLabel = quarterLabel(back);
+  var capsule = [];
+  for(var k=0;k<list.length;k++){
+    var oo = quarterOf(list[k].createdAt || list[k].meetDate);
+    if(oo && quarterLabel(oo) === backLabel) capsule.push(list[k]);
+  }
+
+  var html = '';
+  if(capsule.length){
+    html += '<div class="sec j">' + esc(backLabel) + ' · 那段时间记下的' + capsule.length + '条</div>';
+    for(var c=0;c<capsule.length;c++){
+      var p = capsule[c];
+      var said = p.myView || p.concerns || p.thesis || '（当时只记了基本信息，没写看法）';
+      html += '<div class="capsule">'
+        + '<div class="when">' + esc(backLabel) + '记的 · 现在的状态：'
+        + '<span class="pill ' + statusTone(p.status) + '">' + esc(p.status || '未填') + '</span></div>'
+        + '<div class="who">' + esc(p.company) + '</div>'
+        + '<div class="said">' + esc(said) + '</div>';
+      var jt = judgeText(p);
+      if(jt){
+        var res = p.concernResult || '未验证';
+        html += '<div class="verdict">当时的判断：<span class="pill ' + resultTone(res) + '">' + esc(res) + '</span>'
+          + ' <span style="color:var(--ink3);">' + esc(jt) + '</span>';
+        if(res === '没中' && p.missReason){
+          html += '<div style="margin-top:5px;">为什么没中：' + esc(p.missReason) + '</div>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    html += '<div class="sub-note">左边是你在' + esc(backLabel) + '写下的原话，右边是它后来的走向。'
+      + '隔一段时间回看一遍，比当时任何一次讨论都更能看出你的判断习惯。</div>';
+  }else{
+    html += '<div class="sub-note">' + esc(backLabel) + '那段时间没有记录，换个回看时长看看。</div>';
+  }
+  $('q-body').innerHTML = html;
+}
+
+// 词表完全跟着录入的项目走：项目里出现过什么赛道，这里就长出什么赛道，不让人手动增删
+function renderIndustries(){
+  var list = load();
+  var used = {}, order = [];
+  for(var i=0;i<list.length;i++){
+    var k = list[i].industry;
+    if(!k || list[i].isSample) continue;
+    if(!used[k]){ used[k] = 0; order.push(k); }
+    used[k]++;
+  }
+  if(!order.length){
+    $('ind-list').innerHTML = '<div class="empty">录入项目后，这里会自动长出你看过的赛道</div>';
+    return;
+  }
+  order.sort(function(a,b){ return used[b] - used[a]; });
+  var html = '';
+  for(var j=0;j<order.length;j++){
+    html += '<span class="chip b">' + esc(order[j]) + ' · ' + used[order[j]] + '个</span>';
+  }
+  $('ind-list').innerHTML = html;
+}
+
+function getCloud(){
+  // 没配地址就别建客户端，直接走纯本机
+  if(!CONFIG.endpoint) return null;
+  if(cloudClient) return cloudClient;
+  if(typeof WorkBuddyCloud === 'undefined') return null;
+  cloudClient = WorkBuddyCloud.createWorkBuddyCloud({
+    endpoint: CONFIG.endpoint,
+    publishableKey: CONFIG.publishableKey
+  });
+  return cloudClient;
+}
+
+function getModel(){
+  var c = getCloud();
+  if(!c) return Promise.reject(new Error('SDK_NOT_LOADED'));
+  if(cachedModel) return Promise.resolve(cachedModel);
+  return c.llm.models.list().then(function(models){
+    if(!models || models.length === 0) throw new Error('NO_MODEL');
+    var pick = null;
+    for(var i=0;i<models.length;i++){
+      if(models[i].disabled !== true){ pick = models[i]; break; }
+    }
+    if(!pick) throw new Error('NO_MODEL');
+    cachedModel = pick;
+    return pick;
+  });
+}
+
+function llmCall(systemText, userText, useJSON){
+  // 填了自己的模型接口就走你自己的钥匙，没填才用内置的云端通道
+  if(byokOn()){
+    return byokChat(loadAI(), [
+      { role: 'system', content: systemText },
+      { role: 'user', content: userText }
+    ]);
+  }
+  return getModel().then(function(model){
+    var opt = {
+      model: model.id,
+      messages: [
+        { role: 'system', content: systemText },
+        { role: 'user', content: userText }
+      ],
+      stream: true,
+      temperature: 0.3
+    };
+    if(useJSON) opt.response_format = { type: 'json_object' };
+    var answer = '';
+    var stream = cloudClient.llm.chat.completions.create(opt);
+    var iter = stream[Symbol.asyncIterator] ? stream[Symbol.asyncIterator]() : stream;
+    function step(res){
+      if(res.done) return answer;
+      var d = res.value && res.value.choices && res.value.choices[0] ? res.value.choices[0].delta : null;
+      if(d && d.content) answer += d.content;
+      return Promise.resolve(iter.next()).then(step);
+    }
+    return Promise.resolve(iter.next()).then(step);
+  });
+}
+
+function parseJSON(text){
+  var s = String(text || '').trim();
+  s = s.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '');
+  var i = s.indexOf('{');
+  var j = s.lastIndexOf('}');
+  if(i >= 0 && j > i) s = s.slice(i, j + 1);
+  return JSON.parse(s);
+}
+
+function errText(e){
+  var code = (e && e.error && e.error.code) ? String(e.error.code) : '';
+  var raw = (e && e.message) ? String(e.message) : String(e || '');
+  if(raw === 'SDK_NOT_LOADED'){
+    return byokOn()
+      ? '智能助理没能加载出来，可能是网络不通。表单可以照常手动填写。'
+      : '还没配置模型接口。到「设置」页填你自己的模型钥匙，填完就能用智能整理；不填也能手动录入，只是没有自动整理。';
+  }
+  if(raw === 'NO_MODEL') return '当前没有可用的模型，请稍后再试。表单可以照常手动填写。';
+  if(code.indexOf('auth_') === 0) return '智能整理需要在应用正式访问地址下才能调用，当前是本地预览环境。表单可以照常手动填写，发布后即可使用。';
+  if(code.indexOf('quota_') === 0) return '调用额度暂时用完了，请稍后再试。';
+  if(code.indexOf('request_') === 0) return '请求参数或模型不匹配：' + raw;
+  if(code.indexOf('gateway_') === 0 || code.indexOf('model_') === 0) return '模型服务暂时不可用，请点重试。';
+  if(code.indexOf('internal_') === 0) return '服务内部出错，请稍后再试。';
+  return '整理失败：' + raw;
+}
+
+/* ---------- 上传会议纪要：把文档里的文字抠出来，填进原始记录框 ---------- */
+
+function pickMinutes(){
+  var inp = $('minutes-input');
+  if(inp) inp.click();
+}
+
+function readAsText(file){
+  return new Promise(function(resolve, reject){
+    var r = new FileReader();
+    r.onload = function(){ resolve(String(r.result || '')); };
+    r.onerror = function(){ reject(new Error('文件读取失败')); };
+    r.readAsText(file, 'utf-8');
+  });
+}
+
+function onMinutesPicked(input){
+  var file = input.files && input.files[0];
+  input.value = '';
+  if(!file) return;
+  var name = file.name || '文档';
+  var lower = name.toLowerCase();
+  var st = $('doc-state');
+  var btn = $('btn-doc');
+  if(st) st.textContent = '正在读取「' + name + '」…';
+  if(btn) btn.disabled = true;
+  var work;
+  if(/\.(txt|md|markdown|csv|log|json)$/.test(lower)){
+    work = readAsText(file);
+  }else if(/\.docx$/.test(lower)){
+    work = file.arrayBuffer().then(docxToText);
+  }else if(/\.pdf$/.test(lower)){
+    work = file.arrayBuffer().then(pdfToText);
+  }else{
+    work = Promise.reject(new Error('这个格式暂时读不了，支持 txt / md / docx / pdf'));
+  }
+  work.then(function(text){
+    text = (text || '').replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    if(text.length < 10){
+      if(st) st.textContent = '这个文件没读出文字（多半是扫描件、图片版或加密的 PDF）。'
+        + '请把文字复制粘贴到上面的框里，或另存为 txt / docx 再上传。';
+      return;
+    }
+    var cut = false;
+    if(text.length > 20000){ text = text.slice(0, 20000); cut = true; }
+    var cur = $('raw').value.trim();
+    $('raw').value = (cur ? cur + '\n\n' : '') + text;
+    if(st) st.textContent = '已把「' + name + '」里的 ' + text.length + ' 个字填进上面的框'
+      + (cut ? '（原文太长，只取了前20000字）' : '') + '，看一眼再点智能整理';
+    msg('entry-msg', '文档内容已填进原始记录框，检查后点「智能整理」自动填表', 'ok');
+  }).catch(function(e){
+    if(st) st.textContent = '读取失败：' + (e && e.message ? e.message : '未知错误')
+      + '。也可以直接把文字粘贴到上面的框里。';
+  }).then(function(){
+    if(btn) btn.disabled = false;
+  });
+}
+
+/* docx：本质是 zip 包，取出 word/document.xml 再抠 <w:t> 文字 */
+
+function inflateRaw(u8){
+  return new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw')))
+    .arrayBuffer().then(function(ab){ return new Uint8Array(ab); });
+}
+
+function zipReadEntry(buf, entryName){
+  var u8 = new Uint8Array(buf);
+  var dv = new DataView(buf);
+  var eocd = -1;
+  var min = Math.max(0, u8.length - 22 - 65535);
+  for(var i = u8.length - 22; i >= min; i--){
+    if(dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  }
+  if(eocd < 0) return Promise.reject(new Error('不是有效的 docx 文件'));
+  var cdCount = dv.getUint16(eocd + 10, true);
+  var cdOff = dv.getUint32(eocd + 16, true);
+  var p = cdOff;
+  for(var n = 0; n < cdCount; n++){
+    if(p + 46 > u8.length || dv.getUint32(p, true) !== 0x02014b50) break;
+    var method = dv.getUint16(p + 10, true);
+    var compSize = dv.getUint32(p + 20, true);
+    var nameLen = dv.getUint16(p + 28, true);
+    var extraLen = dv.getUint16(p + 30, true);
+    var commentLen = dv.getUint16(p + 32, true);
+    var lhOff = dv.getUint32(p + 42, true);
+    var nm = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nameLen));
+    if(nm === entryName){
+      var lnLen = dv.getUint16(lhOff + 26, true);
+      var lxLen = dv.getUint16(lhOff + 28, true);
+      var dataOff = lhOff + 30 + lnLen + lxLen;
+      var data = u8.subarray(dataOff, dataOff + compSize);
+      if(method === 0) return Promise.resolve(new TextDecoder('utf-8').decode(data));
+      return inflateRaw(data).then(function(out){ return new TextDecoder('utf-8').decode(out); });
+    }
+    p += 46 + nameLen + extraLen + commentLen;
+  }
+  return Promise.reject(new Error('docx 里没找到正文'));
+}
+
+function decodeXmlEnt(s){
+  return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+}
+
+function docxToText(buf){
+  return zipReadEntry(buf, 'word/document.xml').then(function(xml){
+    var paras = xml.split(/<\/w:p>/);
+    var lines = [];
+    var re = /<w:t[^>]*>([\s\S]*?)<\/w:t>/g;
+    for(var i = 0; i < paras.length; i++){
+      var seg = paras[i];
+      var texts = [];
+      var m;
+      re.lastIndex = 0;
+      while((m = re.exec(seg)) !== null) texts.push(decodeXmlEnt(m[1]));
+      var line = texts.join('').replace(/<w:br\s*\/?>/g, '\n').replace(/<w:tab\s*\/?>/g, '\t');
+      if(line.trim()) lines.push(line);
+    }
+    return lines.join('\n');
+  });
+}
+
+/* pdf：尽力而为地抠文字，支持常见的中日韩字体映射表 */
+
+function findPdfStreams(u8){
+  var res = [];
+  var n = u8.length;
+  var S = [115,116,114,101,97,109];
+  var E = [101,110,100,115,116,114,101,97,109];
+  var i = 0;
+  while(i < n - 6){
+    var hit = true;
+    for(var k = 0; k < 6; k++){ if(u8[i+k] !== S[k]){ hit = false; break; } }
+    if(!hit){ i++; continue; }
+    var st = i + 6;
+    if(u8[st] === 13) st++;
+    if(u8[st] === 10) st++;
+    var en = -1;
+    for(var j = st; j < n - 9; j++){
+      var ok = true;
+      for(var q = 0; q < 9; q++){ if(u8[j+q] !== E[q]){ ok = false; break; } }
+      if(ok){ en = j; break; }
+    }
+    if(en > st){ res.push(u8.subarray(st, en)); i = en + 9; continue; }
+    i++;
+  }
+  return res;
+}
+
+function tryInflate(u8){
+  var p;
+  try{
+    p = new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer();
+  }catch(e){ return Promise.resolve(u8); }
+  return p.then(function(ab){
+    var out = new Uint8Array(ab);
+    var s = new TextDecoder('utf-8').decode(out);
+    if(s.indexOf('Tj') >= 0 || s.indexOf('TJ') >= 0 || s.indexOf('BT') >= 0
+      || s.indexOf('bfchar') >= 0 || s.indexOf('bfrange') >= 0 || s.indexOf('Font') >= 0) return out;
+    return u8;
+  }).catch(function(){ return u8; });
+}
+
+function hexToStr(h){
+  var out = '';
+  for(var i = 0; i + 3 < h.length; i += 4) out += String.fromCharCode(parseInt(h.substr(i, 4), 16));
+  var tail = h.length % 4;
+  if(tail) out += String.fromCharCode(parseInt(h.slice(h.length - tail), 16));
+  return out;
+}
+
+function mergeCmap(cmap, s){
+  var re = /beginbfchar([\s\S]*?)endbfchar/g, m;
+  while((m = re.exec(s)) !== null){
+    var re2 = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g, m2;
+    while((m2 = re2.exec(m[1])) !== null) cmap[m2[1].toLowerCase()] = hexToStr(m2[2]);
+  }
+  var re3 = /beginbfrange([\s\S]*?)endbfrange/g, m3;
+  while((m3 = re3.exec(s)) !== null){
+    var re4 = /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g, m4;
+    while((m4 = re4.exec(m3[1])) !== null){
+      var lo = parseInt(m4[1], 16), hi = parseInt(m4[2], 16), d = m4[3];
+      var base = parseInt(d.slice(-4), 16);
+      for(var c = lo; c <= hi && c <= lo + 65535; c++){
+        cmap[c.toString(16).toLowerCase()] = String.fromCharCode(base + (c - lo));
+      }
+    }
+  }
+}
+
+function decodePdfToken(tok, cmap){
+  tok = tok.trim();
+  if(tok.charAt(0) === '('){
+    var inner = tok.slice(1, -1);
+    return inner.replace(/\\([nrtbf()\\])/g, function(_, c){
+      return ({ n:'\n', r:'\r', t:'\t', b:'\b', f:'\f', '(':'(', ')':')', '\\':'\\' })[c] || c;
+    }).replace(/\\([0-7]{1,3})/g, function(_, o){ return String.fromCharCode(parseInt(o, 8)); });
+  }
+  if(tok.charAt(0) === '<'){
+    var hx = tok.slice(1, -1).replace(/\s+/g, '').toLowerCase();
+    var s = '';
+    for(var i = 0; i + 3 < hx.length; i += 4){
+      var code = hx.substr(i, 4);
+      if(code === '0003' || code === '000a') { s += code === '000a' ? '\n' : ' '; continue; }
+      s += (cmap[code] !== undefined) ? cmap[code] : '';
+    }
+    return s;
+  }
+  return '';
+}
+
+function extractPdfText(s, cmap){
+  var out = '';
+  var lastY = null;
+  var re = /(\[[\s\S]*?\]\s*TJ)|(\((?:\\.|[^\\()])*\)\s*Tj)|(<[0-9A-Fa-f\s]+>\s*Tj)|(\bT\*)|(-?[\d.]+)\s+(-?[\d.]+)\s+T[dD]\b|(\bET\b)/g;
+  var m;
+  while((m = re.exec(s)) !== null){
+    if(m[1]){
+      var re2 = /\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]+>/g, m2;
+      while((m2 = re2.exec(m[1])) !== null) out += decodePdfToken(m2[0], cmap);
+    }else if(m[2]){
+      out += decodePdfToken(m[2].replace(/\s*Tj\s*$/, ''), cmap);
+    }else if(m[3]){
+      out += decodePdfToken(m[3].replace(/\s*Tj\s*$/, ''), cmap);
+    }else if(m[4]){
+      out += '\n'; lastY = null;
+    }else if(m[5]){
+      var y = parseFloat(m[6]);
+      if(lastY !== null && Math.abs(y - lastY) > 0.5) out += '\n';
+      lastY = y;
+    }else if(m[7]){
+      out += '\n';
+    }
+  }
+  return out;
+}
+
+function pdfToText(buf){
+  var streams = findPdfStreams(new Uint8Array(buf));
+  var tasks = [];
+  for(var i = 0; i < streams.length; i++) tasks.push(tryInflate(streams[i]));
+  return Promise.all(tasks).then(function(parts){
+    var cmap = {};
+    var content = [];
+    for(var j = 0; j < parts.length; j++){
+      var s = new TextDecoder('utf-8').decode(parts[j]);
+      if(s.indexOf('bfchar') >= 0 || s.indexOf('bfrange') >= 0) mergeCmap(cmap, s);
+      if(s.indexOf('Tj') >= 0 || s.indexOf('TJ') >= 0) content.push(s);
+    }
+    var out = [];
+    for(var k = 0; k < content.length; k++) out.push(extractPdfText(content[k], cmap));
+    return out.join('\n');
+  });
+}
+
+/* ---------- 设置：模型接口（自带钥匙）与云同步 ---------- */
+
+var AI_CFG_KEY = 'deal-log-ai-v1';
+var CLOUD_CFG_KEY = 'deal-log-cloudcfg-v1';
+
+// 各家都兼容同一套对话格式，所以换厂商只是改这两个字段
+var VENDORS = {
+  deepseek: { base: 'https://api.deepseek.com', model: 'deepseek-chat' },
+  kimi:     { base: 'https://api.moonshot.cn/v1', model: 'moonshot-v1-8k' },
+  zhipu:    { base: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash' },
+  qwen:     { base: 'https://dashscope.aliyuncs.com/compatible-mode/v1', model: 'qwen-plus' },
+  openai:   { base: 'https://api.openai.com/v1', model: 'gpt-4o-mini' }
+};
+
+function loadAI(){
+  try{ return JSON.parse(localStorage.getItem(AI_CFG_KEY) || '{}'); }catch(e){ return {}; }
+}
+function saveAICfg(o){
+  try{ localStorage.setItem(AI_CFG_KEY, JSON.stringify(o)); }catch(e){}
+}
+function byokOn(){
+  var c = loadAI();
+  return !!(c && c.base && c.key && c.model);
+}
+
+// 顶部那盏灯：模型接口填全了就绿，没填就红。只在「接口地址 / 模型名 / 钥匙」三项都齐了才算连上
+function syncModelInd(){
+  var el = $('model-ind');
+  if(!el) return;
+  var on = byokOn();
+  el.className = on ? 'on' : 'off';
+  el.innerHTML = '<i></i>' + (on ? '模型已连接' : '模型未连接');
+  el.title = on ? '智能整理可以用你自己的模型了' : '在设置里填好模型接口，就能用智能整理';
+}
+
+// 换数据存放位置：先弹系统文件夹选择框，再把记录和附件复制到新位置
+function changeDataDir(){
+  if(!isDesktop()) return;
+  msg('datadir-msg', '');
+  window.desktop.pickDataDir().then(function(picked){
+    if(!picked) return null;                       // 用户点了取消
+    msg('datadir-msg', '正在把记录和附件搬到新位置…', 'info');
+    return window.desktop.moveData(String(picked).replace(/[\\/]+$/, ''));
+  }).then(function(r){
+    if(!r) return;
+    if(!r.ok){ msg('datadir-msg', r.reason || '没换成，换个位置试试', 'err'); return; }
+    if(r.unchanged){ msg('datadir-msg', '已经是在这个位置了', 'info'); return; }
+    msg('datadir-msg', '已换到 ' + r.root + '，搬了' + r.moved + '个文件。'
+      + '原来位置的文件还留着，确认没问题后可以自己删掉。', 'ok');
+  }).catch(function(e){
+    msg('datadir-msg', '没换成：' + errText(e), 'err');
+  });
+}
+
+function renderSettings(){
+  var c = loadAI();
+  $('ai-vendor').value = c.vendor || '';
+  $('ai-base').value = c.base || '';
+  $('ai-model').value = c.model || '';
+  $('ai-key').value = c.key || '';
+  $('ai-cfg-state').textContent = byokOn() ? '已配置' : '尚未配置';
+  syncModelInd();
+  $('cf-endpoint').value = CONFIG.endpoint || '';
+  $('cf-pk').value = CONFIG.publishableKey || '';
+  $('cf-state').textContent = CONFIG.endpoint ? '配置成功' : '尚未配置';
+  msg('ai-test-msg', '');
+  if(isDesktop()) $('card-datadir').style.display = 'block';
+}
+
+// 供应商名称是自己敲进去的，认得出来的就顺手把地址和模型名带上；
+// 已经填过的就不动，免得覆盖用户自己改的配置
+function applyVendor(){
+  var v = ($('ai-vendor').value || '').trim().toLowerCase();
+  if(!v) return;
+  var alias = {
+    deepseek:'deepseek', '深度求索':'deepseek', ds:'deepseek',
+    kimi:'kimi', '月之暗面':'kimi', moonshot:'kimi',
+    zhipu:'zhipu', '智谱':'zhipu', glm:'zhipu',
+    qwen:'qwen', '通义':'qwen', '千问':'qwen', '阿里':'qwen', dashscope:'qwen',
+    openai:'openai', gpt:'openai'
+  };
+  var key = alias[v];
+  if(!key){
+    for(var k in alias){
+      if(Object.prototype.hasOwnProperty.call(alias, k) && v.indexOf(k) >= 0){ key = alias[k]; break; }
+    }
+  }
+  var p = key && VENDORS[key];
+  if(!p) return;
+  if(!$('ai-base').value.trim()) $('ai-base').value = p.base;
+  if(!$('ai-model').value.trim()) $('ai-model').value = p.model;
+}
+
+function readAIForm(){
+  return {
+    vendor: $('ai-vendor').value.trim(),
+    base: $('ai-base').value.trim().replace(/\/+$/, ''),
+    model: $('ai-model').value.trim(),
+    key: $('ai-key').value.trim()
+  };
+}
+
+function saveAISettings(){
+  var o = readAIForm();
+  if(!o.base || !o.model || !o.key){
+    msg('ai-test-msg', '三项都要填：接口地址、模型名、API Key', 'err');
+    return;
+  }
+  saveAICfg(o);
+  msg('ai-test-msg', '已保存，智能整理和投资画像都会用你自己的模型', 'ok');
+  renderSettings();
+}
+
+function clearAISettings(){
+  try{ localStorage.removeItem(AI_CFG_KEY); }catch(e){}
+  $('ai-vendor').value = '';
+  $('ai-base').value = ''; $('ai-model').value = ''; $('ai-key').value = '';
+  msg('ai-test-msg', '已清除，这台设备上不再留钥匙', 'ok');
+  renderSettings();
+}
+
+function testAI(){
+  var o = readAIForm();
+  if(!o.base || !o.model || !o.key){
+    msg('ai-test-msg', '先填完三项再测试', 'err');
+    return;
+  }
+  saveAICfg(o);
+  msg('ai-test-msg', '正在连接…', 'info');
+  byokChat(o, [{ role: 'user', content: '只回复两个字：正常' }]).then(function(t){
+    msg('ai-test-msg', '连上了，模型回复：' + String(t || '').slice(0, 30), 'ok');
+  }).catch(function(e){
+    msg('ai-test-msg', '连不上：' + (e && e.message ? e.message : '未知错误'), 'err');
+  });
+}
+
+function saveCloudSettings(){
+  var o = {
+    endpoint: $('cf-endpoint').value.trim().replace(/\/+$/, ''),
+    publishableKey: $('cf-pk').value.trim()
+  };
+  try{ localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(o)); }catch(e){}
+  CONFIG.endpoint = o.endpoint;
+  CONFIG.publishableKey = o.publishableKey;
+  cloudClient = null;
+  if(!o.endpoint){ $('cf-state').textContent = '尚未配置'; syncUserBox(); return; }
+  $('cf-state').textContent = getCloud() ? '配置成功' : '地址或门牌不对，连不上';
+  syncUserBox();
+}
+
+function unwrapChat(raw){
+  var data = raw;
+  if(typeof raw === 'string'){
+    try{ data = JSON.parse(raw); }catch(e){ throw new Error('返回的内容不是标准格式'); }
+  }
+  if(data && data.error){
+    throw new Error((data.error.message || data.error.code || '接口报错'));
+  }
+  var ch = data && data.choices && data.choices[0];
+  var txt = (ch && ch.message) ? ch.message.content : '';
+  if(!txt && ch && ch.delta) txt = ch.delta.content;
+  if(!txt) throw new Error('模型没返回内容，检查模型名填得对不对');
+  return txt;
+}
+
+function byokChat(cfg, messages){
+  var url = cfg.base.replace(/\/+$/, '') + '/chat/completions';
+  // 复制粘贴常带进换行和空格，先清掉
+  var key = String(cfg.key || '').replace(/\s+/g, '');
+  // 注意：这里必须返回被拒绝的 Promise 而不是直接 throw，否则调用方挂的 .catch 接不到
+  if(!key) return Promise.reject(new Error('API Key 是空的'));
+  // 请求头只能是英文字符，有中文说明多半复制多了东西
+  if(/[^\x00-\x7F]/.test(key)){
+    return Promise.reject(new Error('API Key 里有中文或奇怪的字符，多半是复制的时候多带了东西，请重新复制一次'));
+  }
+  var headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key };
+  var body = { model: cfg.model, messages: messages, temperature: 0.3 };
+  // 桌面版走主进程发请求，绕开浏览器的跨域限制
+  if(isDesktop()){
+    return window.desktop.llmChat(url, headers, body).then(function(r){
+      if(r.status === 0){
+        throw new Error('连不上这个接口地址，检查地址填得对不对、网络通不通');
+      }
+      if(r.status < 200 || r.status >= 300){
+        throw new Error('接口返回 ' + r.status + '：' + String(r.body || '').slice(0, 160));
+      }
+      return unwrapChat(r.body);
+    });
+  }
+  return fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body) })
+    .then(function(res){
+      return res.text().then(function(txt){
+        if(!res.ok) throw new Error('接口返回 ' + res.status + '：' + txt.slice(0, 160));
+        return unwrapChat(txt);
+      });
+    }).catch(function(e){
+      if(e && e.message && e.message.indexOf('Failed to fetch') >= 0){
+        throw new Error('连不上这个接口地址。浏览器版可能被跨域拦住了，用桌面版就没有这个问题');
+      }
+      throw e;
+    });
+}
+
+function aiParse(){
+  var raw = $('raw').value.trim();
+  if(!raw){ msg('entry-msg', '智能整理为空', 'err'); return; }
+  var btn = $('btn-ai');
+  btn.disabled = true;
+  btn.textContent = '整理中…';
+  $('ai-state').textContent = '正在读取并整理，通常几秒钟';
+  msg('entry-msg', '');
+  var indList = industries().join('、');
+  var system = '你是一位私募股权投资人的助理，负责把投资人随手写的会议笔记整理成结构化项目记录。'
+    + '只输出一个JSON对象，不要输出任何解释或多余文字。'
+    + '所有字段值都必须是字符串；笔记里没提到的字段一律填空字符串，绝对不要编造事实。'
+    + 'industry优先从这些里面选一个：' + indList + '。如果都不贴切，直接输出一个简洁准确的赛道名称，不要超过8个字，绝对不要输出"其他"两个字。'
+    + 'round优先从这里选：' + rounds().join('、') + '。如果都不符合，直接输出轮次名称，绝对不要输出"其他"两个字。'
+    + 'status必须从这里选：' + STATUSES.join('、') + '。'
+    + 'sourceType必须从这里选：' + SOURCES.join('、') + '。如果来源是融资顾问推送、已投公司推荐、朋友介绍或行业会议，把具体的机构名、公司名、人名或会议名填进sourceDetail。'
+    + 'credibility必须从这里选：' + CREDIBILITY.join('、') + '。'
+    + 'score是1到5的整数字符串，没提到就填3。'
+    + 'myView填入投资人自己的判断和情绪，concerns填入疑虑和风险，不要把对方说的话当成投资人的看法。'
+    + 'thesis用一句话概括投资逻辑，说不清就填"待想清楚"。';
+  var user = '请把下面这段原始笔记整理成项目记录JSON，字段包括：'
+    + FIELDS.join(',') + '。\n\n原始笔记：\n' + raw;
+  llmCall(system, user, true).then(function(text){
+    var d = parseJSON(text);
+    writeForm(d);
+    $('ai-state').textContent = '整理完成，请核对下面的字段';
+    msg('entry-msg', '已自动填好，请核对必填项和数字，确认无误后保存', 'ok');
+  }).catch(function(e){
+    $('ai-state').textContent = '';
+    msg('entry-msg', errText(e), 'err');
+  }).then(function(){
+    btn.disabled = false;
+    btn.textContent = editingId ? '重新智能整理' : '智能整理';
+  });
+}
+
+function aiPortrait(){
+  var list = load();
+  var real = [];
+  for(var i=0;i<list.length;i++){ if(!list[i].isSample) real.push(list[i]); }
+  if(real.length === 0){ msg('portrait-msg', '还没有真实记录，先去录入几条', 'err'); return; }
+  var btn = $('btn-portrait');
+  btn.disabled = true;
+  btn.textContent = '分析中…';
+  msg('portrait-msg', '正在通读全部记录，项目较多时会慢一些', 'info');
+  $('portrait').innerHTML = '';
+  var brief = [];
+  for(var i=0;i<real.length;i++){
+    var p = real[i];
+    brief.push('#' + (i+1) + ' 公司：' + p.company + '｜行业：' + p.industry + '｜轮次：' + p.round
+      + '｜状态：' + p.status + '｜来源：' + p.sourceType + '｜兴趣度：' + p.score
+      + '｜投资逻辑：' + (p.thesis || '无')
+      + '｜我的看法：' + (p.myView || '无')
+    + '｜我的判断：' + (judgeText(p) || '无')
+    + '｜判断结果：' + (judgeText(p) ? (p.concernResult || '未验证') : '无')
+    + (p.missReason ? '｜为什么没中：' + p.missReason : '')
+      + (p.dropReason ? '｜放弃原因：' + p.dropReason : ''));
+  }
+  var system = '你是一位资深投资机构的合夥人，正在帮一位投资人做自我复盘。'
+    + '你会基于他真实的项目记录，给出诚实、具体、不吹捧的画像分析。'
+    + '必须紧扣记录里真实出现过的内容，不允许编造没有记录支撑的结论。'
+    + '用中文回答，用小标题分段，语气直接。';
+  var user = '下面是这位投资人累计的' + real.length + '条项目记录：\n\n' + brief.join('\n')
+    + '\n\n请从以下几个维度分析，并在最后给出改进建议：\n'
+    + '1. 赛道集中度：实际压在哪些赛道，占比如何，有没有嘴上说分散实际很集中\n'
+    + '2. 轮次偏好：主要在哪一轮看项目，偏早期还是偏后期\n'
+    + '3. 决策风格：决策推进到什么程度就停住，是果断还是犹豫\n'
+    + '4. 放弃理由聚类：不投的原因集中在哪几类\n'
+    + '5. 兴趣度与结果的关系：高分项目是否真的推进得更远\n'
+    + '6. 盲区：哪些明显热门的方向一条都没看过，哪些来源渠道从没产出过\n'
+    + '7. 预测验证情况：他做过哪些预测、命中率如何、在哪些类型的判断上一贯出错（如果还没验证过，就直说数据不足，不要硬编）\n'
+    + '8. 三条最该改的具体建议\n'
+    + '注意：只下判断，不要给任何具体项目的买卖建议，也不要推荐该投什么。';
+  llmCall(system, user, false).then(function(text){
+    $('portrait').innerHTML = esc(text).replace(/\n/g, '<br>');
+    msg('portrait-msg', '分析完成', 'ok');
+  }).catch(function(e){
+    msg('portrait-msg', errText(e), 'err');
+  }).then(function(){
+    btn.disabled = false;
+    btn.textContent = '生成投资画像';
+  });
+}
+
+// 「打开网页版」跳到哪里。想用就改成你自己的在线地址（比如部署到 GitHub Pages 之后的地址）。
+// 留空是安全的默认值：点的时候会提示你先配置，而不是跳到一个别人的网站。
+var ONLINE_URL = '';
+
+function goOnline(){
+  if(!ONLINE_URL){ alert('还没有配置网页版地址。\n\n在 index.html 里把 ONLINE_URL 改成你自己的在线地址即可（例如部署到 GitHub Pages 的地址）。'); return; }
+  location.href = ONLINE_URL;
+}
+
+function checkOrigin(){
+  // 桌面版虽然也是 file:// 打开，但数据存在本机文件里，不用弹这个提示
+  if(location.protocol === 'file:' && !isDesktop()) $('banner').className = 'banner show';
+}
+
+var pendingOtp = null;
+var forgotHandle = null;
+
+function authMsg(text, kind){ msg('auth-msg', text, kind); }
+
+function authErr(e){
+  var kind = e && e.kind ? String(e.kind) : '';
+  if(kind === 'invalid_grant' || kind === 'unauthenticated') return '邮箱或密码不对，请重试';
+  return (e && e.message) ? e.message : '操作失败，请重试';
+}
+
+function authTab(name){
+  var panes = ['pwd','otp','up','forgot'];
+  for(var i=0;i<panes.length;i++){
+    $('apane-' + panes[i]).style.display = panes[i] === name ? 'block' : 'none';
+    var t = $('atab-' + panes[i]);
+    if(t) t.className = 'btn' + (panes[i] === name ? ' on' : '');
+  }
+  authMsg('');
+}
+
+function pickMode(name){
+  $('pane-local').style.display = name === 'local' ? 'block' : 'none';
+  $('pane-cloud').style.display = name === 'cloud' ? 'block' : 'none';
+  $('mode-local').className = 'mode-card' + (name === 'local' ? ' on' : '');
+  $('mode-cloud').className = 'mode-card' + (name === 'cloud' ? ' on' : '');
+  if(name === 'cloud') authTab('pwd');
+}
+
+function showAuth(){
+  $('auth-shell').style.display = 'block';
+  $('app-shell').style.display = 'none';
+  $('user-box').style.display = 'none';
+  pickMode(null);
+}
+
+function showApp(email){
+  $('auth-shell').style.display = 'none';
+  $('app-shell').style.display = 'block';
+  $('user-box').style.display = 'flex';
+  $('user-email').textContent = email || '';
+}
+
+function useOffline(){
+  cloudOn = false;
+  currentUserId = null; currentFiles = []; pendingFiles = []; uploading = 0;
+  CACHE = readLocal();
+  showApp('');
+  $('sync-state').style.display = 'none';
+  $('user-email').style.display = 'none';
+  syncModelInd();
+  syncUserBox();
+  refreshAllViews();
+}
+
+// 右上角那颗按钮：只有配了云同步才露出来，因为登录唯一的用处就是换设备同步
+function syncUserBox(){
+  var box = $('user-box'), btn = $('btn-switch');
+  if(!box || !btn) return;
+  if(CONFIG.endpoint){
+    box.style.display = 'flex';
+    btn.style.display = '';
+    btn.textContent = '登录同步';
+    btn.onclick = function(){ showAuth(); pickMode('cloud'); };
+  }else{
+    box.style.display = 'none';
+  }
+}
+
+function migrateLocal(local){
+  if(!local || local.length === 0) return Promise.resolve(0);
+  if(CACHE.length > 0) return Promise.resolve(0);
+  var rows = [];
+  for(var i=0;i<local.length;i++) rows.push({ deal_id: local[i].id, data: local[i] });
+  return cloudClient.database.from('deals').insert(rows).then(function(res){
+    if(res.error) throw res.error;
+    CACHE = local;
+    return local.length;
+  });
+}
+
+function afterSignIn(session){
+  cloudOn = true;
+  currentUserId = session && session.user ? session.user.id : null;
+  var email = session && session.user ? (session.user.email || '') : '';
+  showApp(email);
+  $('sync-state').style.display = 'inline-block';
+  $('user-email').style.display = 'inline';
+  $('btn-switch').textContent = '退出';
+  $('btn-switch').onclick = doSignOut;
+  syncModelInd();
+  setSync('同步中', 'pending');
+  var localSnapshot = readLocal();
+  pullCloud().then(function(){
+    return pullSetting('industries', KEY_IND);
+  }).then(function(){
+    return pullSetting('rounds', KEY_ROUND);
+  }).then(function(){
+    initSelects();
+    return migrateLocal(localSnapshot);
+  }).then(function(n){
+    return seedSamples().then(function(){ return n; });
+  }).then(function(n){
+    writeLocal(CACHE);
+    setSync('已同步', '');
+    refreshAllViews();
+    if(n > 0) msg('entry-msg', '已把你本机原有的' + n + '条记录搬到云端，换设备登录就能看到', 'ok');
+  }).catch(function(){
+    CACHE = localSnapshot;
+    writeLocal(CACHE);
+    setSync('离线模式', 'off');
+    refreshAllViews();
+  });
+}
+
+function loginPwd(){
+  var email = $('pw-email').value.trim();
+  var password = $('pw-pass').value;
+  if(!email || !password){ authMsg('请填邮箱和密码', 'err'); return; }
+  authMsg('登录中…', 'info');
+  cloudClient.auth.signInWithPassword({ email: email, password: password }).then(function(res){
+    if(res.error){ authMsg(authErr(res.error), 'err'); return; }
+    afterSignIn(res.data);
+  }).catch(function(){ authMsg('网络不通，请检查连接后重试', 'err'); });
+}
+
+function sendCode(purpose){
+  var email = purpose === 'up' ? $('up-email').value.trim() : $('ot-email').value.trim();
+  if(!email){ authMsg('请先填邮箱', 'err'); return; }
+  var btn = purpose === 'up' ? $('up-send') : $('ot-send');
+  btn.disabled = true;
+  btn.textContent = '发送中';
+  cloudClient.auth.sendOtp({ email: email }).then(function(res){
+    btn.disabled = false;
+    btn.textContent = '获取验证码';
+    if(res.error){ authMsg(authErr(res.error), 'err'); return; }
+    pendingOtp = {
+      email: email,
+      verificationId: res.data.verificationId,
+      isExistingUser: res.data.isExistingUser,
+      purpose: purpose
+    };
+    authMsg('验证码已发到邮箱，请查收后填入', 'ok');
+  }).catch(function(){ btn.disabled = false; btn.textContent = '获取验证码'; authMsg('网络不通，请检查连接后重试', 'err'); });
+}
+
+function loginOtp(){
+  var email = $('ot-email').value.trim();
+  var code = $('ot-code').value.trim();
+  if(!pendingOtp || pendingOtp.purpose !== 'ot' || pendingOtp.email !== email){
+    authMsg('请先点获取验证码', 'err'); return;
+  }
+  if(!code){ authMsg('请填验证码', 'err'); return; }
+  authMsg('验证中…', 'info');
+  cloudClient.auth.verifyOtp({
+    email: pendingOtp.email,
+    verificationId: pendingOtp.verificationId,
+    isExistingUser: pendingOtp.isExistingUser,
+    token: code
+  }).then(function(res){
+    if(res.error){ authMsg(authErr(res.error), 'err'); return; }
+    pendingOtp = null;
+    afterSignIn(res.data);
+  }).catch(function(){ authMsg('网络不通，请检查连接后重试', 'err'); });
+}
+
+function finishSignUp(invite, code, password){
+  authMsg('注册中…', 'info');
+  cloudClient.auth.verifyOtp({
+    email: pendingOtp.email,
+    verificationId: pendingOtp.verificationId,
+    isExistingUser: pendingOtp.isExistingUser,
+    token: code,
+    password: password
+  }).then(function(res){
+    if(res.error){ authMsg(authErr(res.error), 'err'); return; }
+    pendingOtp = null;
+    if(invite && cloudClient && cloudClient.database){
+      cloudClient.database.rpc('consume_invite', { p_code: invite });
+    }
+    afterSignIn(res.data);
+  }).catch(function(){ authMsg('网络不通，请检查连接后重试', 'err'); });
+}
+
+function signUp(){
+  if(!cloudClient){ authMsg('云服务未连接，暂时没法注册', 'err'); return; }
+  var email = $('up-email').value.trim();
+  var code = $('up-code').value.trim();
+  var password = $('up-pass').value;
+  var invite = $('up-invite').value.trim();
+  if(INVITE_REQUIRED && !invite){ authMsg('请填邀请码', 'err'); return; }
+  if(!pendingOtp || pendingOtp.purpose !== 'up' || pendingOtp.email !== email){
+    authMsg('请先点获取验证码', 'err'); return;
+  }
+  if(!code){ authMsg('请填验证码', 'err'); return; }
+  if(!password){ authMsg('请设置一个密码，以后可以直接登录', 'err'); return; }
+  if(!INVITE_REQUIRED){ finishSignUp('', code, password); return; }
+  authMsg('校验邀请码…', 'info');
+  cloudClient.database.rpc('check_invite', { p_code: invite }).then(function(res){
+    if(res.error){
+      // 自建的云库里如果没建这两个函数，就不设邀请门槛，直接放行注册
+      if(inviteMissing(res.error)){ finishSignUp('', code, password); return; }
+      authMsg('邀请码校验失败：' + (res.error.message || '请稍后再试'), 'err'); return;
+    }
+    if(res.data !== true){
+      authMsg('邀请码不对或已用完，找把这个链接给你的人要一个', 'err'); return;
+    }
+    finishSignUp(invite, code, password);
+  }).catch(function(){ authMsg('网络不通，请检查连接后重试', 'err'); });
+}
+
+// 判断是不是「库里根本没有这个函数」，而不是「码不对」
+function inviteMissing(err){
+  var m = String((err && err.message) || '');
+  var c = String((err && (err.code || err.details)) || '');
+  if(m.indexOf('does not exist') >= 0 || m.indexOf('function') >= 0 && m.indexOf('not exist') >= 0) return true;
+  if(c.indexOf('42883') >= 0 || c.indexOf('PGRST202') >= 0) return true;
+  return false;
+}
+
+function forgotSend(){
+  var email = $('fg-email').value.trim();
+  if(!email){ authMsg('请先填邮箱', 'err'); return; }
+  authMsg('发送中…', 'info');
+  cloudClient.auth.resetPasswordForEmail(email).then(function(res){
+    if(res.error){ authMsg(authErr(res.error), 'err'); return; }
+    forgotHandle = res.data;
+    authMsg('重置验证码已发到邮箱，请填入下方', 'ok');
+  }).catch(function(){ authMsg('网络不通，请检查连接后重试', 'err'); });
+}
+
+function forgotReset(){
+  if(!forgotHandle){ authMsg('请先点第一步发送验证码', 'err'); return; }
+  var code = $('fg-code').value.trim();
+  var np = $('fg-pass').value;
+  if(!code || !np){ authMsg('请填验证码和新密码', 'err'); return; }
+  authMsg('重置中…', 'info');
+  Promise.resolve(forgotHandle.updateUser({ nonce: code, password: np })).then(function(res){
+    if(res && res.error){ authMsg(authErr(res.error), 'err'); return; }
+    forgotHandle = null;
+    authMsg('密码已重置，用新密码登录吧', 'ok');
+    authTab('pwd');
+  }).catch(function(){ authMsg('重置失败，请重试', 'err'); });
+}
+
+function doSignOut(){
+  if(!window.confirm('退出后这台设备不再显示项目记录（云端数据还在，重新登录就回来）。确定退出吗？')) return;
+  cloudOn = false;
+  currentUserId = null; currentFiles = []; pendingFiles = []; uploading = 0;
+  CACHE = [];
+  writeLocal([]);
+  if(cloudClient && cloudClient.auth) cloudClient.auth.signOut();
+  refreshAllViews();
+  showAuth();
+}
+
+function boot(){
+  initSelects();
+  syncConditional();
+  syncModelInd();
+  checkOrigin();
+  // 没开邀请码门槛就把那一栏收起来，注册不用填码
+  if(!INVITE_REQUIRED){
+    var wi = $('wrap-invite');
+    if(wi) wi.style.display = 'none';
+  }
+  renderStats();
+  // 桌面版：数据用本机文件，不自动连云，直接进本机模式
+  if(isDesktop()){
+    startDesktop();
+    return;
+  }
+  var c = getCloud();
+  if(!c){
+    // 没填云同步的地址，登录就没有意义了（登录只是云同步的门票），直接进本机模式
+    $('mode-cloud').style.display = 'none';
+    useOffline();
+    return;
+  }
+  c.auth.getSession().then(function(res){
+    if(res.error || !res.data){ showAuth(); return; }
+    afterSignIn(res.data);
+  }).catch(function(){ showAuth(); });
+}
+
+$('f-status').addEventListener('change', syncConditional);
+$('f-industry').addEventListener('change', function(){ syncConditional(); showRecall(); });
+$('f-industryOther').addEventListener('input', showRecall);
+$('f-round').addEventListener('change', syncConditional);
+$('f-sourceType').addEventListener('change', syncConditional);
+boot();
+</script>
+</body>
+</html>
