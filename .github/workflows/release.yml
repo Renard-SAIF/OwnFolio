@@ -1,0 +1,118 @@
+name: 构建安装包
+
+# 什么时候跑：
+#   1. 推了一个 v 开头的版本号标签（比如 v1.4.0）→ 构建并发布成正式版本
+#   2. 在 GitHub 网页上手动点「Run workflow」→ 只构建，不发布（用来试跑）
+#
+# 为什么要这个东西：
+#   Mac 的安装包必须用 macOS 自己的打包工具才能做，在 Windows 电脑上做不出来。
+#   所以让 GitHub 提供的 Mac 服务器来干这件事——公开仓库免费。
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  # ---------------- Windows ----------------
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 装依赖
+        run: npm ci
+        working-directory: desktop
+      - name: 打包（安装版 + 免安装版）
+        run: npx electron-builder --win --publish never
+        working-directory: desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 安装包-windows
+          path: |
+            desktop/dist/*.exe
+            desktop/dist/*.blockmap
+
+  # ---------------- macOS ----------------
+  # 这一步是重点：跑在 GitHub 的 Mac 服务器上，所以能打出真正的 Mac 安装包
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 装依赖
+        run: npm ci
+        working-directory: desktop
+      - name: 生成 Mac 图标（icns 格式）
+        run: bash scripts/make-icns.sh
+        working-directory: desktop
+      - name: 打包（Intel 芯片 + Apple 芯片）
+        run: npx electron-builder --mac --publish never
+        working-directory: desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 安装包-macos
+          path: |
+            desktop/dist/*.dmg
+            desktop/dist/*.zip
+
+  # ---------------- Linux ----------------
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 装依赖
+        run: npm ci
+        working-directory: desktop
+      - name: 打包 AppImage
+        run: npx electron-builder --linux --publish never
+        working-directory: desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 安装包-linux
+          path: desktop/dist/*.AppImage
+
+  # ---------------- 汇总发布 ----------------
+  # 只有打标签时才发正式版本；手动触发只留构建结果，不发版本
+  release:
+    needs: [build-windows, build-macos, build-linux]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: 安装包
+      - name: 把三个平台的安装包挂到这个版本上
+        uses: softprops/action-gh-release@v2
+        with:
+          files: 安装包/**/*
+          body: |
+            ## 下载哪个
+
+            | 你的电脑 | 下载 |
+            |---|---|
+            | Windows | `投资项目记录台-…-x64.exe`（安装版）或 `…-免安装版.exe`（解压即用） |
+            | Mac 英特尔芯片 | `…-mac-x64.dmg` |
+            | Mac Apple 芯片（M1/M2/M3） | `…-mac-arm64.dmg` |
+            | Linux | `…-linux-x86_64.AppImage` |
+
+            ### Mac 用户请注意
+
+            这份安装包没有做苹果开发者签名（签名需要每年付费的开发者账号）。
+            第一次打开时系统会拦一下，说"来自身份不明的开发者"。
+
+            解决办法：**右键点这个应用 → 选「打开」→ 再点一次「打开」**。
+            这样弄过一次之后，以后双击就能正常开了。
+
+            另外提供 `.zip` 格式，解压后直接拖进「应用程序」文件夹即可。
+          draft: false
+          prerelease: false
