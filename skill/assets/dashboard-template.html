@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>投资看板</title>
+<!-- 本看板由 WorkBuddy「投资项目记录台」skill 生成，数据已内嵌，零外部依赖 -->
+<style>
+:root{
+  --bg:#f6f7f9; --card:#fff; --ink:#101828; --ink2:#475467; --ink3:#8a929e;
+  --line:#eaecf0; --line2:#d0d5dd;
+  --brand:#1d4ed8; --brand-soft:#eef2ff;
+  --ok:#0f6e56; --ok-soft:#e4f3ee;
+  --warn:#854f0b; --warn-soft:#fdf4e3;
+  --danger:#a52d2d; --danger-soft:#fbeced;
+  --accent:#534ab7; --accent-soft:#eeedfe;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.65;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.wrap{max-width:1060px;margin:0 auto;padding:22px 26px 40px}
+header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+h1{margin:0;font-size:19px;font-weight:600;letter-spacing:.2px}
+.meta{font-size:12px;color:var(--ink3)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:20px 22px;margin-top:14px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.card h2{margin:0 0 3px;font-size:15px;font-weight:600;letter-spacing:.2px}
+.card h2 .sub{font-weight:400;font-size:12px;color:var(--ink3);margin-left:8px}
+.hint{font-size:12px;color:var(--ink3);margin:0 0 12px;line-height:1.7}
+/* 指标卡 */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.metric .n{font-size:26px;font-weight:600;line-height:1.2;font-variant-numeric:tabular-nums}
+.metric .l{font-size:12px;color:var(--ink3);margin-top:2px}
+/* 该跟进 */
+.follow-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.follow-item:last-child{border-bottom:0}
+.follow-item .nm{flex:1;font-weight:500;min-width:0}
+.follow-item .dt{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+/* 条形图 */
+.bars{margin-top:4px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.bar-row .lb{width:96px;flex:none;font-size:12px;color:var(--ink2);text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-row .tr{display:block;flex:1;height:18px;background:#f2f4f7;border-radius:5px;overflow:hidden}
+.bar-row .fl{display:block;height:100%;border-radius:5px;background:var(--brand)}
+.bar-row .vv{width:34px;flex:none;font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+/* 两块并排 */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* 横评表 */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:11px;margin-top:12px}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:900px}
+.tbl th{text-align:left;font-weight:600;color:var(--ink3);font-size:11.5px;padding:9px;
+  border-bottom:1px solid var(--line2);background:#fafbfc;white-space:nowrap}
+.tbl td{padding:9px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.65;
+  word-break:break-word}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:#fafbfc}
+.tbl .cmp{font-weight:600}
+.tbl .none{color:var(--ink3)}
+.pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.pill.g{background:var(--ok-soft);color:var(--ok)}
+.pill.b{background:var(--brand-soft);color:var(--brand)}
+.pill.w{background:#fdf4e3;color:var(--warn)}
+.pill.r{background:var(--danger-soft);color:var(--danger)}
+.pill.n{background:#f0f2f5;color:var(--ink2)}
+.clamped{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}
+.clampbox.open .clamped{display:block;-webkit-line-clamp:none;overflow:visible}
+.morebtn{border:0;background:none;padding:0;margin-top:4px;cursor:pointer;font-family:inherit;
+  font-size:11.5px;color:var(--brand)}
+/* 胶囊 */
+.capsule{border-left:3px solid var(--accent);background:var(--accent-soft);
+  border-radius:0 10px 10px 0;padding:12px 15px;margin-bottom:10px}
+.capsule .when{font-size:11px;color:var(--accent);font-weight:600;margin-bottom:4px}
+.capsule .who{font-size:13.5px;font-weight:600;margin-bottom:5px}
+.capsule .said{font-size:12.5px;color:var(--ink2);line-height:1.75;white-space:pre-wrap}
+.capsule .later{font-size:12px;margin-top:7px;color:var(--ink3)}
+/* 控件 */
+select{font-size:14px;padding:8px 10px;border:1px solid var(--line2);border-radius:9px;
+  background:#fff;color:var(--ink);font-family:inherit;min-height:44px;max-width:100%}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.empty{text-align:center;color:var(--ink3);font-size:13px;padding:30px 0}
+.empty svg{margin-bottom:10px;opacity:.5}
+.note{font-size:12px;color:var(--ink3);line-height:1.7;margin-top:10px}
+.hide{display:none}
+@media (max-width:768px){
+  .wrap{padding:16px 14px 32px}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .two{grid-template-columns:1fr}
+  .bar-row .lb{width:74px}
+  select{font-size:16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>投资看板</h1>
+    <span class="meta" id="meta-line"></span>
+  </header>
+
+  <div id="follow-card" class="card hide">
+    <h2>该跟进了</h2>
+    <div id="follow-body"></div>
+  </div>
+
+  <div class="metrics" id="metrics"></div>
+
+  <div class="two">
+    <div class="card">
+      <h2>行业分布</h2>
+      <p class="hint">你看过的项目都集中在哪几个赛道</p>
+      <div class="bars" id="c-industry"></div>
+    </div>
+    <div class="card">
+      <h2>推进程度</h2>
+      <p class="hint">从初次接触到已投，卡在哪一步</p>
+      <div class="bars" id="c-status"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>季度节奏<span class="sub" id="quarter-sub"></span></h2>
+    <p class="hint">每个季度新聊了几个项目、平均兴趣度多少</p>
+    <div id="c-quarter"></div>
+  </div>
+
+  <div class="card">
+    <h2>同赛道横评</h2>
+    <p class="hint">把同一个赛道看过的公司摆在一起比</p>
+    <div class="row"><select id="track-sel"></select></div>
+    <div id="cmp-body"></div>
+  </div>
+
+  <div class="card">
+    <h2>时间胶囊<span class="sub">回到过去，看当时写下的原话</span></h2>
+    <p class="hint">左边是你当时写下的，右边是它后来的走向</p>
+    <div class="row"><select id="cap-sel">
+      <option value="6">回到半年前</option>
+      <option value="12">回到一年前</option>
+      <option value="24">回到两年前</option>
+    </select></div>
+    <div id="cap-body"></div>
+  </div>
+
+  <div class="card">
+    <h2>打脸清单<span class="sub" id="hit-sub"></span></h2>
+    <p class="hint">你做过的预测，后来到底准不准</p>
+    <div id="hit-body"></div>
+  </div>
+</div>
+
+<script>
+var DATA = __DASHBOARD_DATA__;
+</script>
+<script>
+/* ---------- 工具 ---------- */
+function $(id){ return document.getElementById(id); }
+function esc(s){
+  return String(s === null || s === undefined ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function statusTone(s){
+  if(s === '已投') return 'g';
+  if(s === '已放弃') return 'r';
+  if(s === '深度尽调' || s === '已过投委会' || s === '已出投资意向书') return 'b';
+  if(s === '持续观察') return 'w';
+  return 'n';
+}
+function resultTone(r){
+  if(r === '中了') return 'g';
+  if(r === '没中') return 'r';
+  if(r === '还没发生') return 'w';
+  return 'n';
+}
+function clamp(s){
+  var t = String(s || '').trim();
+  if(!t) return '<span class="none">—</span>';
+  return '<div class="clampbox"><div class="clamped">' + esc(t) + '</div>'
+    + '<button type="button" class="morebtn" onclick="toggleClamp(this)">展开全文</button></div>';
+}
+function toggleClamp(btn){
+  var box = btn.parentNode;
+  var open = box.className.indexOf('open') >= 0;
+  box.className = open ? 'clampbox' : 'clampbox open';
+  btn.textContent = open ? '展开全文' : '收起';
+  fitClamps();
+}
+function fitClamps(){
+  var boxes = document.querySelectorAll('.clampbox');
+  for(var i=0;i<boxes.length;i++){
+    var b = boxes[i];
+    if(b.className.indexOf('open') >= 0) continue;
+    var inner = b.firstChild, btn = b.querySelector('.morebtn');
+    if(!inner || !btn) continue;
+    if(inner.scrollHeight <= inner.clientHeight + 1) btn.style.display = 'none';
+  }
+}
+function svgEmpty(txt){
+  return '<div class="empty"><svg width="42" height="42" viewBox="0 0 40 40" fill="none">'
+    + '<rect x="6.5" y="9.5" width="27" height="21" rx="3" stroke="#8a929e" stroke-width="1.5"/>'
+    + '<path d="M6.5 16h27M14.5 9.5v6.5" stroke="#8a929e" stroke-width="1.5" stroke-linecap="round"/>'
+    + '</svg><div>' + esc(txt) + '</div></div>';
+}
+
+/* ---------- 渲染：顶部 ---------- */
+function renderMeta(){
+  var m = DATA.meta || {};
+  var t = [];
+  if(m.generatedAt) t.push('生成于' + m.generatedAt);
+  if(m.source) t.push(m.source);
+  if(m.total) t.push('共' + m.total + '个项目');
+  $('meta-line').textContent = t.join(' · ');
+}
+function renderMetrics(){
+  var k = DATA.metrics || {};
+  var cells = [
+    { n: k.total || 0, l: '共看过' },
+    { n: k.invested || 0, l: '已投' },
+    { n: (k.avgScore === null || k.avgScore === undefined) ? '—' : k.avgScore, l: '平均兴趣度' },
+    { n: k.hitDone ? (k.hitRate + '%') : '—', l: '预测命中 · 已验' + (k.hitDone || 0) + '次' }
+  ];
+  var h = '';
+  for(var i=0;i<cells.length;i++){
+    h += '<div class="metric"><div class="n">' + cells[i].n + '</div><div class="l">' + cells[i].l + '</div></div>';
+  }
+  $('metrics').innerHTML = h;
+}
+function renderFollow(){
+  var list = DATA.follow || [];
+  if(!list.length){ $('follow-card').className = 'card hide'; return; }
+  $('follow-card').className = 'card';
+  var h = '';
+  for(var i=0;i<list.length;i++){
+    var f = list[i];
+    var color = f.overdue ? 'var(--danger)' : 'var(--warn)';
+    var label = f.overdue ? ('逾期' + f.days + '天') : (f.days === 0 ? '今天' : f.days + '天后');
+    h += '<div class="follow-item"><span class="dot" style="background:' + color + '"></span>'
+      + '<span class="nm">' + esc(f.company) + '</span>'
+      + '<span class="dt">' + esc(f.nextFollow) + ' · ' + label + '</span></div>';
+  }
+  $('follow-body').innerHTML = h;
+}
+
+/* ---------- 渲染：条形图 ---------- */
+function drawBars(id, list){
+  var box = $(id);
+  if(!list || !list.length){ box.innerHTML = svgEmpty('还没有数据'); return; }
+  var max = 1;
+  for(var i=0;i<list.length;i++){ if(list[i].n > max) max = list[i].n; }
+  var h = '';
+  for(var j=0;j<list.length;j++){
+    var it = list[j];
+    var pct = Math.round(it.n / max * 100);
+    h += '<div class="bar-row"><span class="lb" title="' + esc(it.name) + '">' + esc(it.name) + '</span>'
+      + '<span class="tr"><span class="fl" style="width:' + pct + '%;background:' + (it.color || 'var(--brand)') + '"></span></span>'
+      + '<span class="vv">' + it.n + '</span></div>';
+  }
+  box.innerHTML = h;
+}
+function renderQuarter(){
+  var qs = DATA.quarters || [];
+  if(!qs.length){ $('c-quarter').innerHTML = svgEmpty('还没有数据'); return; }
+  var max = 1;
+  for(var i=0;i<qs.length;i++){ if(qs[i].n > max) max = qs[i].n; }
+  var W = qs.length * 76, H = 130;
+  var s = '<div style="overflow-x:auto"><svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img">';
+  for(var j=0;j<qs.length;j++){
+    var q = qs[j];
+    var bh = Math.round(q.n / max * 78);
+    var x = j * 76 + 18, y = 96 - bh;
+    s += '<rect x="' + x + '" y="' + y + '" width="40" height="' + (bh || 2) + '" rx="4" fill="#1d4ed8" opacity="0.85"/>';
+    s += '<text x="' + (x + 20) + '" y="' + (y - 6) + '" text-anchor="middle" font-size="12" fill="#475467">' + q.n + '</text>';
+    s += '<text x="' + (x + 20) + '" y="114" text-anchor="middle" font-size="11" fill="#8a929e">' + esc(q.label) + '</text>';
+    if(q.avg) s += '<text x="' + (x + 20) + '" y="128" text-anchor="middle" font-size="10" fill="#8a929e">' + q.avg + '分</text>';
+  }
+  s += '</svg></div>';
+  $('c-quarter').innerHTML = s;
+  var sub = $('quarter-sub');
+  if(sub) sub.textContent = '近' + qs.length + '个季度';
+}
+
+/* ---------- 渲染：横评 ---------- */
+function renderTrackSel(){
+  var sel = $('track-sel');
+  var names = DATA.trackNames || [];
+  var h = '';
+  for(var i=0;i<names.length;i++) h += '<option value="' + esc(names[i]) + '">' + esc(names[i]) + '</option>';
+  sel.innerHTML = h;
+  if(names.length) sel.value = names[0];
+  sel.onchange = renderCompare;
+}
+function renderCompare(){
+  var name = $('track-sel').value;
+  var list = (DATA.tracks || {})[name] || [];
+  if(!list.length){ $('cmp-body').innerHTML = svgEmpty('这个赛道还没有记录'); return; }
+  var h = '<div class="tbl-wrap"><table class="tbl"><thead><tr>'
+    + '<th>公司</th><th>轮次</th><th>状态</th><th>兴趣度</th>'
+    + '<th>本轮融资与估值</th><th>一句话投资逻辑</th><th>我的看法</th></tr></thead><tbody>';
+  for(var i=0;i<list.length;i++){
+    var p = list[i];
+    h += '<tr><td class="cmp">' + esc(p.company) + '</td>'
+      + '<td>' + (p.round ? esc(p.round) : '<span class="none">—</span>') + '</td>'
+      + '<td><span class="pill ' + statusTone(p.status) + '">' + (p.status ? esc(p.status) : '—') + '</span></td>'
+      + '<td>' + (p.score ? esc(p.score) : '<span class="none">—</span>') + '</td>'
+      + '<td>' + clamp(p.financing) + '</td>'
+      + '<td>' + clamp(p.thesis) + '</td>'
+      + '<td>' + clamp(p.myView) + '</td></tr>';
+  }
+  h += '</tbody></table></div>';
+  var note = (DATA.trackNotes || {})[name];
+  if(note) h += '<div class="note">' + esc(note) + '</div>';
+  $('cmp-body').innerHTML = h;
+  fitClamps();
+}
+
+/* ---------- 渲染：时间胶囊 ---------- */
+function renderCapsule(){
+  var n = $('cap-sel').value;
+  var list = (DATA.capsule || {})[String(n)] || [];
+  if(!list.length){ $('cap-body').innerHTML = svgEmpty('那段时间没有留下看法'); return; }
+  var h = '';
+  for(var i=0;i<list.length;i++){
+    var c = list[i];
+    h += '<div class="capsule"><div class="when">' + esc(c.at) + '</div>'
+      + '<div class="who">' + esc(c.company) + '</div>'
+      + '<div class="said">' + esc(c.view || '') + (c.expect ? '\n当时的预测：' + c.expect : '') + '</div>'
+      + '<div class="later">后来的走向：' + esc(c.later || '还没有结论') + '</div></div>';
+  }
+  $('cap-body').innerHTML = h;
+}
+
+/* ---------- 渲染：打脸清单 ---------- */
+function renderHit(){
+  var list = DATA.hits || [];
+  var sub = $('hit-sub');
+  if(sub) sub.textContent = (DATA.metrics && DATA.metrics.hitDone) ? ('已验证' + DATA.metrics.hitDone + '次') : '';
+  if(!list.length){ $('hit-body').innerHTML = svgEmpty('还没有回填过结果'); return; }
+  var h = '<div class="tbl-wrap"><table class="tbl"><thead><tr>'
+    + '<th>公司</th><th>时点</th><th>当时的预测</th><th>结果</th><th>为什么没中</th>'
+    + '</tr></thead><tbody>';
+  for(var i=0;i<list.length;i++){
+    var r = list[i];
+    h += '<tr><td class="cmp">' + esc(r.company) + '</td><td>' + esc(r.at) + '</td>'
+      + '<td>' + clamp(r.expect) + '</td>'
+      + '<td><span class="pill ' + resultTone(r.result) + '">' + esc(r.result) + '</span></td>'
+      + '<td>' + clamp(r.missReason) + '</td></tr>';
+  }
+  h += '</tbody></table></div>';
+  $('hit-body').innerHTML = h;
+  fitClamps();
+}
+
+/* ---------- 统一刷新入口（铁律：渲染函数之间互不调用） ---------- */
+function refreshAll(){
+  renderMeta();
+  renderFollow();
+  renderMetrics();
+  drawBars('c-industry', DATA.industry);
+  drawBars('c-status', DATA.statusFunnel);
+  renderQuarter();
+  renderTrackSel();
+  renderCompare();
+  renderCapsule();
+  renderHit();
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  if(!DATA || (!DATA.projects || !DATA.projects.length) && !(DATA.metrics && DATA.metrics.total)){
+    document.querySelector('.wrap').innerHTML =
+      '<div class="card"><h2>还没有项目</h2>' + svgEmpty('把 BP 或会议纪要发给我，我来录入并生成看板') + '</div>';
+    return;
+  }
+  $('cap-sel').onchange = renderCapsule;
+  refreshAll();
+});
+</script>
+</body>
+</html>
