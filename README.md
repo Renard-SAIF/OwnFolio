@@ -33,7 +33,7 @@
 
 **点击即用，无需安装，支持端侧协同**。
 
-![网页版](web/screenshot.png)
+![网页版](docs/screenshot.png)
 
 - **直接用**：把 [`web/index.html`](web/index.html) 下载下来，双击用浏览器打开
 - **部署成网址**：在仓库Settings → Pages里，把来源设成 `main` 分支的 `/web` 文件夹，
@@ -44,7 +44,7 @@
 
 手机版（窄屏自动单列）：
 
-![网页版手机端](web/screenshot-mobile.png)
+![网页版手机端](docs/screenshot-mobile.png)
 
 ## 形态三：桌面版
 
