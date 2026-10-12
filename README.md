@@ -1,4 +1,4 @@
-# 📈 OwnFolio — Deal Log & Judgement Review for Investors
+# 📈 OwnFolio: Deal Log & Judgement Review for Investors
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Renard-SAIF/OwnFolio/blob/main/LICENSE)
 [![Ships as](https://img.shields.io/badge/Ships%20as-Skill%20%7C%20Web%20%7C%20Desktop-8A63D2)](https://github.com/Renard-SAIF/OwnFolio/blob/main/README.md)
