@@ -1,14 +1,9 @@
 # 📈 OwnFolio — Deal Log & Judgement Review for Early-Stage Investors
 
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-
-![Ships as](https://img.shields.io/badge/Ships%20as-Skill%20%7C%20Web%20%7C%20Desktop-8A63D2)
-
-![Desktop](https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS%20%7C%20Linux-00C2A8)
-
-![Backend](https://img.shields.io/badge/Backend-none-brightgreen.svg)
-
-![Star this repo](https://img.shields.io/github/stars/Renard-SAIF/OwnFolio?style=social)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Renard-SAIF/OwnFolio/blob/main/LICENSE)
+[![Ships as](https://img.shields.io/badge/Ships%20as-Skill%20%7C%20Web%20%7C%20Desktop-8A63D2)](https://github.com/Renard-SAIF/OwnFolio/blob/main/README.md)
+[![Desktop](https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS%20%7C%20Linux-00C2A8)](https://github.com/Renard-SAIF/OwnFolio/releases/tag/v1.4.0)
+[![Star this repo](https://img.shields.io/github/stars/Renard-SAIF/OwnFolio?style=social)](https://github.com/Renard-SAIF/OwnFolio)
 
 **An open-source toolkit that helps early-stage investors keep a deal log and grade their own judgement over time.**
 
@@ -100,8 +95,6 @@ On first run it will ask **where your deal library is** and remember the answer.
 ### Option 2 — Web app
 
 **Nothing to install. Works in any modern browser.**
-
-![Web app](docs/screenshot.png)
 
 - **Just open it** — download [`docs/index.html`](docs/index.html) and double-click it.
 - **Or host it** — in your repo go to **Settings → Pages**, set the source to the `main` branch and the `/docs` folder, and you get a URL like `https://<your-username>.github.io/OwnFolio/` that works on your phone too.
