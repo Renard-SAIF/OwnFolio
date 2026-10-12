@@ -35,8 +35,3 @@
   并且必须保留"没有openpyxl时降级输出CSV"的逻辑
 - 运行过 `python scripts/render_dashboard.py --demo --out demo.html`，
   打开确认八个区块都正常渲染、控制台没有报错，再提交
-
-## 不要提交的东西
-
-`references/current-library.md` 是你的本地文件（记录你自己的项目库在哪，含令牌），
-已在 `.gitignore` 里排除。**不要手动加进版本控制。**
