@@ -5,7 +5,7 @@
 [![Desktop](https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS%20%7C%20Linux-00C2A8)](https://github.com/Renard-SAIF/OwnFolio/releases/tag/v1.4.0)
 [![Star this repo](https://img.shields.io/github/stars/Renard-SAIF/OwnFolio?style=social)](https://github.com/Renard-SAIF/OwnFolio)
 
-**An open-source toolkit that helps early-stage investors keep a deal log and grade their own judgement over time.**
+**An open-source toolkit that helps primary market investors keep a deal log and grade their own judgement over time.**
 
 > Most deal trackers solve "how do I write it down". That is not the hard part. Six months later you cannot remember *why* you liked a company, what you were worried about, or whether any of it turned out to be true. OwnFolio is built around one thing: **every judgement you make stays on the record, dated, and can be graded later.**
 
