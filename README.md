@@ -22,22 +22,28 @@
 
 ## ❓ FAQ
 
-**Do I have to install anything?**  
+**Do I have to install anything?**
+  
 No, not if you don't want to. The web app is a single HTML file — download it and double-click. The desktop app is optional and has a portable build with no installer.
 
-**Where does my data live?**  
+**Where does my data live?**
+  
 With you, always. It depends on the form: your own spreadsheet (agent skill), your browser (web app), or a folder you pick on your own disk (desktop app). This project has **no server, no database and no account**.
 
-**Which libraries can it write to?**  
+**Which libraries can it write to?**
+  
 Feishu (Sheet and Bitable), DingTalk, local Excel / CSV, and Tencent Docs. See [`skill/references/storage-adapters.md`](skill/references/storage-adapters.md).
 
-**Can I just hand it a pitch deck or a transcript?**  
+**Can I just hand it a pitch deck or a transcript?**
+  
 Yes — that is what the agent skill is for. It extracts **22 standard fields**, comes back to you about the required ones it could not find, and writes only after you confirm.
 
-**Does it work on my phone?**  
+**Does it work on my phone?**
+  
 The web app does. It collapses to a single column on narrow screens and can be added to your home screen.
 
-**Is it free?**  
+**Is it free?**
+  
 Yes. MIT licensed, fully open source. Nothing to sign up for, nothing to pay for.
 
 ## 🆚 A plain spreadsheet vs. OwnFolio
@@ -101,8 +107,6 @@ On first run it will ask **where your deal library is** and remember the answer.
 - **Or host it** — in your repo go to **Settings → Pages**, set the source to the `main` branch and the `/docs` folder, and you get a URL like `https://<your-username>.github.io/OwnFolio/` that works on your phone too.
 
 Data is stored in your browser. **Export a backup before clearing browser data.**
-
-![Web app on mobile](docs/screenshot-mobile.png)
 
 ### Option 3 — Desktop app
 
